@@ -1,1 +1,1 @@
-export const getShowMoreMarkup = () => `<button class="films-list__show-more">Show more</button>`;
+export const getShowMoreComponent = () => `<button class="films-list__show-more">Show more</button>`;

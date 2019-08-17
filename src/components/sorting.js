@@ -1,4 +1,4 @@
-export const getSortingMarkup = () => {
+export const getSortingComponent = () => {
   return `
     <ul class="sort">
       <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
