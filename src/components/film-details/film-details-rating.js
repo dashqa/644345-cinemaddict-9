@@ -1,4 +1,4 @@
-import {PIC_PATH} from "../config";
+import {PIC_PATH} from "../../config";
 
 export const getFilmDetailsRating = (title, picture) => {
   return `

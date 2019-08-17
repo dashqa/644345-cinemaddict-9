@@ -1,4 +1,4 @@
-export const PIC_PATH = `/images/posters`;
+export const PIC_PATH = `./images/posters`;
 export const MAX_DESCRIPTION_LENGTH = 139;
 export const FILMS_QUANTITY = 17;
 export const CARDS_PER_PAGE = 5;

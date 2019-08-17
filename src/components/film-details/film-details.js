@@ -1,4 +1,4 @@
-import {PIC_PATH} from '../config';
+import {PIC_PATH} from '../../config';
 import {getFilmDetailsRating} from './film-details-rating';
 import {getFilmDetailsComments} from './film-details-comments';
 
