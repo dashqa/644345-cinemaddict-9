@@ -84,10 +84,10 @@ const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
   }
 };
 
-  const renderExtraSection = (arrayForRender, type) => {
-    const container = main.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
-    arrayForRender = findMost(state.films, type);
-    renderComponent(container, getCards(arrayForRender));
+const renderExtraSection = (arrayForRender, type) => {
+  const container = main.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
+  arrayForRender = findMost(state.films, type);
+  renderComponent(container, getCards(arrayForRender));
 };
 
 const renderFilms = () => {
