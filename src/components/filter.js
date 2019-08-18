@@ -1,11 +1,11 @@
-export const getFiltersComponent = (filters) => {
-  return filters.map((filter) => renderFilter(filter)).join(``);
+export const getFilters = (filters) => {
+  return filters.map((filter) => getFilterMarkup(filter)).join(``);
 };
 
-export const renderFilter = ({title, count}) => {
+export const getFilterMarkup = ({title, count, isMain = false}) => {
   return `
     <a href="#" class="main-navigation__item">${title}
-      ${title !== `All movies` ? `<span class="main-navigation__item-count">${count}</span>` : ``}
+      ${!isMain ? `<span class="main-navigation__item-count">${count}</span>` : ``}
     </a>
   `;
 };

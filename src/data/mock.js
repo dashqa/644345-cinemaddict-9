@@ -1,4 +1,4 @@
-import {getRandomInt, getRandomFloat, getRandomArray} from './../utils';
+import {getRandomInt, getRandomFloat, getRandomArray, getRandomItem} from './../utils';
 
 const TITLES = [`Fast & Furious Presents: Hobbs & Shaw`, `Scary Stories to Tell in the Dark`, `The Lion King`,
   `Dora and the Lost City of Gold`, `Once Upon a Time ... in Hollywood`, `The Art of Racing in the Rain`,
@@ -19,7 +19,7 @@ const MAX_RATING = 10;
 
 const generateFilmData = () => ({
   get title() {
-    return TITLES[getRandomInt(0, TITLES.length - 1)];
+    return getRandomItem(TITLES);
   },
   get rating() {
     return getRandomFloat(0, MAX_RATING).toFixed(1);
@@ -36,7 +36,7 @@ const generateFilmData = () => ({
     return tempSet;
   },
   get picture() {
-    return PICTURES[getRandomInt(0, PICTURES.length - 1)];
+    return getRandomItem(PICTURES);
   },
   get description() {
     const sentences = DESCRIPTION.split(`.`);

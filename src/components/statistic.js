@@ -1,4 +1,4 @@
-export const getStatisticComponent = ({rank, watchedQuantity, watchedDuration, topGenre}) => {
+export const getStatisticMarkup = ({rank, watchedQuantity, watchedDuration, topGenre}) => {
   return `
     <section class="statistic">
     ${rank ? `<p class="statistic__rank">

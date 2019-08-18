@@ -1,16 +1,16 @@
-import {getSearchComponent} from './components/search';
-import {getNavComponent} from './components/nav';
-import {getProfileComponent} from './components/profile';
-import {getSortingComponent} from './components/sorting';
-import {getFilmSectionComponent} from './components/film-section';
-import {getCardComponent} from './components/film-card';
+import {getSearchMarkup} from './components/search';
+import {getNavMarkup} from './components/nav';
+import {getProfileMarkup} from './components/profile';
+import {getSortingMarkup} from './components/sorting';
+import {getFilmSectionMarkup} from './components/film-section';
+import {getCards} from './components/film-card';
 import {getMock} from './data/mock';
-import {getRandomArray} from './utils';
-import {FILM_SECTIONS, FILMS_QUANTITY, CARDS_PER_PAGE} from './config';
+import {getRandomArray, getSortingValue} from './utils';
+import {FILM_SECTIONS, FILMS_QUANTITY, CARDS_PER_PAGE, STUB} from './config';
 
 const filmsData = getMock(FILMS_QUANTITY);
-const headerContainer = document.querySelector(`.header`);
-const mainContainer = document.querySelector(`.main`);
+const header = document.querySelector(`.header`);
+const main = document.querySelector(`.main`);
 let forRender = {
   main: [],
   rated: [],
@@ -28,6 +28,7 @@ const state = {
     return [{
       title: `All movies`,
       count: this.films.length,
+      isMain: true,
     }, {
       title: `Watchlist`,
       count: this.watchlist.length,
@@ -60,65 +61,52 @@ const renderComponent = (container, component) => {
 };
 
 const findMost = (array, findBy) => {
-  let sorted = [];
-  switch (findBy) {
-    case `rating`:
-      sorted = array.sort((a, b) => a.rating < b.rating ? 1 : -1);
-      return sorted.every(film => film.rating === array[0].rating) ?
-        getRandomArray(sorted, 2) : sorted.slice(0, 2);
+  const sorted = array.sort((a, b) => getSortingValue(b, findBy) - getSortingValue(a, findBy));
+  const first = getSortingValue(sorted[0], findBy);
+  const last = getSortingValue(sorted[sorted.length - 1],findBy);
 
-    case `comments`:
-      sorted = array.sort((a, b) => a.comments.length < b.comments.length ? 1 : -1);
-      return sorted.every(film => film.comments.length === array[0].comments.length) ?
-        getRandomArray(sorted, 2) : sorted.slice(0, 2);
+  if (first && last !== 0) {
+    return first === last ? getRandomArray(sorted, 2) : sorted.slice(0, 2);
   }
+  return null;
 };
 
-const renderFirstSection = (start = 0, end = CARDS_PER_PAGE) => {
+const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
   const buttonElement = document.querySelector(`.films-list__show-more`);
-  const container = document.querySelectorAll(`.films-list__container`)[0];
+  const container = main.querySelectorAll(`.films-list__container`)[0];
 
   forRender.main = state.films.slice(start, end);
   state.updateQuantityCounter(forRender.main.length);
-  renderComponent(container, getCardComponent(forRender.main));
+  renderComponent(container, getCards(forRender.main));
 
   if (state.quantityCounter >= FILMS_QUANTITY || FILMS_QUANTITY < CARDS_PER_PAGE) {
     buttonElement.remove();
   }
 };
 
-  const renderRestSection = (type) => {
-    let container = ``;
-    switch (type) {
-      case `rated`:
-        container = document.querySelectorAll(`.films-list__container`)[1];
-        forRender.rated = findMost(state.films, `rating`);
-        renderComponent(container, getCardComponent(forRender.rated));
-        break;
-      case `commented`:
-        container = document.querySelectorAll(`.films-list__container`)[2];
-        forRender.commented = findMost(state.films, `comments`);
-        renderComponent(container, getCardComponent(forRender.commented));
-    }
+  const renderExtraSection = (arrayForRender, type) => {
+    const container = main.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
+    arrayForRender = findMost(state.films, type);
+    renderComponent(container, getCards(arrayForRender));
 };
 
 const renderFilms = () => {
-  renderFirstSection();
-  renderRestSection(`rated`);
-  renderRestSection(`commented`);
+  renderMainSection();
+  renderExtraSection(forRender.rated, `rating`);
+  renderExtraSection(forRender.commented, `comments`);
 };
 
-renderComponent(headerContainer, getSearchComponent());
-renderComponent(headerContainer, getProfileComponent(state.userRating));
-renderComponent(mainContainer, getNavComponent(state.filters));
-renderComponent(mainContainer, getSortingComponent());
-renderComponent(mainContainer, getFilmSectionComponent(FILM_SECTIONS));
+renderComponent(header, getSearchMarkup());
+renderComponent(header, getProfileMarkup(state.userRating));
+renderComponent(main, getNavMarkup(state.filters));
+renderComponent(main, getSortingMarkup());
+renderComponent(main, getFilmSectionMarkup(FILM_SECTIONS));
 renderFilms();
 
 const onClickMoreButton = () => {
   const start = state.quantityCounter;
   const end = state.quantityCounter + state.leftToShow;
-  renderFirstSection(start, end);
+  renderMainSection(start, end);
 };
 
 const buttonElement = document.querySelector(`.films-list__show-more`);

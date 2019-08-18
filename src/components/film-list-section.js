@@ -1,18 +1,17 @@
-import {getShowMoreComponent} from './show-more';
+import {getShowMoreMarkup} from './show-more';
 
-export const getFilmListSectionComponent = (sections) => {
-  return sections.map((section) => renderFilmListSection(section)).join(``);
+export const getFilmListSections = (sections) => {
+  return sections.map((section) => getFilmListSectionMarkup(section)).join(``);
 };
 
-export const renderFilmListSection = ({title, isExtra = false, isDisplay = true}) => {
+export const getFilmListSectionMarkup = ({title, isExtra = false}) => {
   return `
-    ${isDisplay ?
-    `<section class="${isExtra ? `films-list--extra` : `films-list`}">
+    <section class="${isExtra ? `films-list--extra` : `films-list`}">
       <h2 class="films-list__title ${!isExtra ? `visually-hidden` : ``}">
         ${title}
       </h2>
       <div class="films-list__container"></div>
-      ${!isExtra ? `${getShowMoreComponent()}` : ``}
-    </section>` : ``}
+      ${!isExtra ? getShowMoreMarkup() : ``}
+    </section>
   `;
 };

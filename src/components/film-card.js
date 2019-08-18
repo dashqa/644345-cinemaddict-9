@@ -1,11 +1,11 @@
-import {trimString} from '../utils';
+import {truncateString} from '../utils';
 import {PIC_PATH, MAX_DESCRIPTION_LENGTH} from '../config';
 
-export const getCardComponent = (films) => {
-  return films.map((film) => renderCard(film)).join(``);
+export const getCards = (films) => {
+  return films.map((film) => getCardMarkup(film)).join(``);
 };
 
-export const renderCard = ({title, rating, year, duration, genres, picture, description}) => {
+export const getCardMarkup = ({title, rating, year, duration, genres, picture, description}) => {
   return `
     <article class="film-card">
       <h3 class="film-card__title">${title}</h3>
@@ -16,7 +16,7 @@ export const renderCard = ({title, rating, year, duration, genres, picture, desc
         ${Array.from(genres).map((genre) => `<span class="film-card__genre">${genre}</span>`).join(``)}
       </p>
       <img src="${PIC_PATH}/${picture}" alt="${title}" class="film-card__poster">
-      <p class="film-card__description">${trimString(description, MAX_DESCRIPTION_LENGTH)}</p>
+      <p class="film-card__description">${truncateString(description, MAX_DESCRIPTION_LENGTH)}</p>
       <a class="film-card__comments">5 comments</a>
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>

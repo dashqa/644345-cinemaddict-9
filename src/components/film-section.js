@@ -1,8 +1,8 @@
-import {getFilmListSectionComponent} from './film-list-section';
+import {getFilmListSections} from './film-list-section';
 
-export const getFilmSectionComponent = (sections) => {
+export const getFilmSectionMarkup = (sections) => {
   return ` 
-     <section class="films">${getFilmListSectionComponent(sections)}</section>
+     <section class="films">${getFilmListSections(sections)}</section>
   `;
 };
 

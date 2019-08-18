@@ -1,4 +1,4 @@
-export const getFilmDetailsComments = ({comments}) => {
+export const getDetailsCommentsMarkup = ({comments}) => {
   return `
   <section class="film-details__comments-wrap">
     <h3 class="film-details__comments-title">Comments 

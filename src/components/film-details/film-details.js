@@ -1,8 +1,8 @@
 import {PIC_PATH} from '../../config';
-import {getFilmDetailsRating} from './film-details-rating';
-import {getFilmDetailsComments} from './film-details-comments';
+import {getDetailsRatingMarkup} from './film-details-rating';
+import {getDetailsCommentsMarkup} from './film-details-comments';
 
-export const getFilmDetailsComponent = ({title, originalTitle, minAge, rating, director, writers, actors, releaseDate,
+export const getDetailsMarkup = ({title, originalTitle, minAge, rating, director, writers, actors, releaseDate,
   duration, country, genres, description, picture, comments}) => {
   return `
     <section class="film-details">
@@ -82,11 +82,11 @@ export const getFilmDetailsComponent = ({title, originalTitle, minAge, rating, d
         </div>
         
         <div class="form-details__middle-container">
-          ${getFilmDetailsRating(title, picture)}
+          ${getDetailsRatingMarkup(title, picture)}
         </div>
         
         <div class="form-details__bottom-container">
-          ${getFilmDetailsComments(comments)}
+          ${getDetailsCommentsMarkup(comments)}
         </div>
       </form>
     </section>

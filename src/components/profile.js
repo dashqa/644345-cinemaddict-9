@@ -1,18 +1,20 @@
-const getTitle = (rating) => {
-  switch (true) {
-    case rating >= 1 && rating <= 10:
-      return `Novice`;
-    case rating >= 11 && rating <= 20:
-      return `Fan`;
-    default: return `Movie Buff`;
-  }
-};
+const ratings = [{
+  title: `Novice`,
+  minRating: 1,
+}, {
+  title: `Fan`,
+  minRating: 10,
+}, {
+  title: `Movie Buff`,
+  minRating: 21,
+}];
 
-export const getProfileComponent = (rating) => {
+
+export const getProfileMarkup = (rating) => {
   return `
     <section class="header__profile profile">
     ${rating ?
-    `<p class="profile__rating">${getTitle(rating)}</p>` : ``}
+    `<p class="profile__rating">${ratings.filter((item) => item.minRating <= rating).pop().title}</p>` : ``}
       <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>
   `;
