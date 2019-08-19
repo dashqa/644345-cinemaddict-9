@@ -1,58 +1,109 @@
-import { getSearchMarkup } from "./components/search";
-import { getNavMenuMarkup } from "./components/nav-menu";
-import { getProfileMarkup } from "./components/profile";
-import { getSortingMarkup } from "./components/sorting";
-import { getFilmSectionMarkup } from "./components/film-section";
-import { getFilmListSectionMarkup } from "./components/film-list-section";
-import { getCardMarkup } from "./components/film-card";
-import { getShowMoreMarkup } from "./components/show-more";
+import {getSearchMarkup} from './components/search';
+import {getNavMarkup} from './components/nav';
+import {getProfileMarkup} from './components/profile';
+import {getSortingMarkup} from './components/sorting';
+import {getFilmSectionMarkup} from './components/film-section';
+import {getCards} from './components/film-card';
+import {getMock} from './data/mock';
+import {getRandomArray, getSortingValue} from './utils';
+import {FILM_SECTIONS, FILMS_QUANTITY, CARDS_PER_PAGE, STUB} from './config';
 
-const filmSections = [
-  {
-    title: `All movies. Upcoming`,
-    cardsQuantity: 5,
-    isExtra: false
+const filmsData = getMock(FILMS_QUANTITY);
+const header = document.querySelector(`.header`);
+const main = document.querySelector(`.main`);
+let filmsForRender = [];
+
+const state = {
+  films: JSON.parse(JSON.stringify(filmsData)),
+  quantityCounter: 0,
+  userRating: 0,
+  watchlist: [],
+  watched: [],
+  favorites: [],
+  get filters() {
+    return [{
+      title: `All movies`,
+      count: this.films.length,
+      isMain: true,
+    }, {
+      title: `Watchlist`,
+      count: this.watchlist.length,
+    }, {
+      title: `History`,
+      count: this.watched.length,
+    }, {
+      title: `Favorites`,
+      count: this.favorites.length,
+    }]
   },
-  {
-    title: `Top rated movies`,
-    cardsQuantity: 2,
-    isExtra: true
+  get statistic() {
+    return [{
+      rank: `-`,
+      watchedQuantity: this.watched.length || 0,
+      watchedDuration: 0,
+      topGenre: `-`,
+    }]
   },
-  {
-    title: `Most commented`,
-    cardsQuantity: 2,
-    isExtra: true
+  get leftToShow() {
+    return this.films.length - this.quantityCounter;
+  },
+  updateQuantityCounter(quantity) {
+    this.quantityCounter += quantity;
+  },
+};
+
+const renderComponent = (container, component) => {
+  container.insertAdjacentHTML(`beforeend`, component);
+};
+
+const findMost = (array, findBy) => {
+  const sorted = array.sort((a, b) => getSortingValue(b, findBy) - getSortingValue(a, findBy));
+  const first = getSortingValue(sorted[0], findBy);
+  const last = getSortingValue(sorted[sorted.length - 1],findBy);
+
+  if (first && last !== 0) {
+    return first === last ? getRandomArray(sorted, 2) : sorted.slice(0, 2);
   }
-];
-const headerContainer = document.querySelector(`.header`);
-const mainContainer = document.querySelector(`.main`);
+  return null;
+};
 
+const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
+  const buttonElement = document.querySelector(`.films-list__show-more`);
+  const container = main.querySelectorAll(`.films-list__container`)[0];
 
-const renderComponent = (container, markup, quantity = 1) => {
-  for (let i = 0; i < quantity; i++) {
-    container.insertAdjacentHTML(`beforeend`, markup);
+  filmsForRender = state.films.slice(start, end);
+  state.updateQuantityCounter(filmsForRender.length);
+  renderComponent(container, getCards(filmsForRender));
+
+  if (state.quantityCounter >= FILMS_QUANTITY || FILMS_QUANTITY < CARDS_PER_PAGE) {
+    buttonElement.remove();
   }
 };
 
-const renderFilmsBoard = () => {
-  const filmsElement = document.querySelector(`.films`);
-
-  filmSections.forEach((section, index) => {
-    renderComponent(filmsElement, getFilmListSectionMarkup(section.title, section.isExtra));
-    let filmListElement = filmsElement.children[index];
-    let filmListContainer = filmListElement.querySelector(`.films-list__container`);
-
-    renderComponent(filmListContainer, getCardMarkup(), section.cardsQuantity);
-
-    if(!section.isExtra) {
-      renderComponent(filmListElement, getShowMoreMarkup());
-    }
-  });
+const renderExtraSection = (type) => {
+  const container = main.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
+  renderComponent(container, getCards(findMost(state.films, type)));
 };
 
-renderComponent(headerContainer, getSearchMarkup());
-renderComponent(headerContainer, getProfileMarkup());
-renderComponent(mainContainer, getNavMenuMarkup());
-renderComponent(mainContainer, getSortingMarkup());
-renderComponent(mainContainer, getFilmSectionMarkup());
-renderFilmsBoard();
+const renderFilms = () => {
+  renderMainSection();
+  renderExtraSection(`rating`);
+  renderExtraSection(`comments`);
+};
+
+renderComponent(header, getSearchMarkup());
+renderComponent(header, getProfileMarkup(state.userRating));
+renderComponent(main, getNavMarkup(state.filters));
+renderComponent(main, getSortingMarkup());
+renderComponent(main, getFilmSectionMarkup(FILM_SECTIONS));
+renderFilms();
+
+const onClickMoreButton = () => {
+  const start = state.quantityCounter;
+  const end = state.quantityCounter + state.leftToShow;
+  renderMainSection(start, end);
+};
+
+const buttonElement = document.querySelector(`.films-list__show-more`);
+buttonElement.addEventListener(`click`, onClickMoreButton);
+export default state;
