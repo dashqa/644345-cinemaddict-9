@@ -11,11 +11,7 @@ import {FILM_SECTIONS, FILMS_QUANTITY, CARDS_PER_PAGE, STUB} from './config';
 const filmsData = getMock(FILMS_QUANTITY);
 const header = document.querySelector(`.header`);
 const main = document.querySelector(`.main`);
-let forRender = {
-  main: [],
-  rated: [],
-  commented: [],
-};
+let filmsForRender = [];
 
 const state = {
   films: JSON.parse(JSON.stringify(filmsData)),
@@ -75,25 +71,24 @@ const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
   const buttonElement = document.querySelector(`.films-list__show-more`);
   const container = main.querySelectorAll(`.films-list__container`)[0];
 
-  forRender.main = state.films.slice(start, end);
-  state.updateQuantityCounter(forRender.main.length);
-  renderComponent(container, getCards(forRender.main));
+  filmsForRender = state.films.slice(start, end);
+  state.updateQuantityCounter(filmsForRender.length);
+  renderComponent(container, getCards(filmsForRender));
 
   if (state.quantityCounter >= FILMS_QUANTITY || FILMS_QUANTITY < CARDS_PER_PAGE) {
     buttonElement.remove();
   }
 };
 
-const renderExtraSection = (arrayForRender, type) => {
+const renderExtraSection = (type) => {
   const container = main.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
-  arrayForRender = findMost(state.films, type);
-  renderComponent(container, getCards(arrayForRender));
+  renderComponent(container, getCards(findMost(state.films, type)));
 };
 
 const renderFilms = () => {
   renderMainSection();
-  renderExtraSection(forRender.rated, `rating`);
-  renderExtraSection(forRender.commented, `comments`);
+  renderExtraSection(`rating`);
+  renderExtraSection(`comments`);
 };
 
 renderComponent(header, getSearchMarkup());
