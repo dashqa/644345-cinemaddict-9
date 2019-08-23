@@ -17,7 +17,7 @@ const PICTURES = [`made-for-each-other.png`, `popeye-meets-sinbad.png`, `sagebru
   `the-dance-of-life.jpg`, `the-great-flamarion.jpg`, `the-man-with-the-golden-arm.jpg`];
 const MAX_RATING = 10;
 
-const generateFilmData = () => ({
+export const generateFilmData = () => ({
   get title() {
     return getRandomItem(TITLES);
   },
@@ -55,9 +55,5 @@ const generateFilmData = () => ({
   }],
   duration: `1h 55m`
 });
-
-export const getMock = (quantity) => {
-  return [...Array(quantity)].map(generateFilmData);
-};
 
 
