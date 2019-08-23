@@ -1,6 +1,6 @@
 import {generateFilmData} from './data/mock';
-import {getRandomArray, getSortingValue, render} from './utils';
-import {FILM_SECTIONS, PageElements, Position, FILMS_QUANTITY, CARDS_PER_PAGE} from './config';
+import {getRandomArray, getSortingValue, render, createElement} from './utils';
+import {PageElements, Position, FILM_SECTIONS, STUB_ELEMENT, FILMS_QUANTITY, CARDS_PER_PAGE} from './config';
 import Card from './components/film-card';
 import CardDetails from './components/film-details';
 import Profile from './components/profile';
@@ -65,9 +65,6 @@ const state = {
       topGenre: `-`,
     }]
   },
-  get leftToShow() {
-    return this.films.length - this.quantityCounter;
-  },
   updateQuantityCounter(quantity) {
     this.quantityCounter += quantity;
   },
@@ -101,7 +98,9 @@ const renderFilmSections = (sections) => {
   board.classList.add(`films`);
   PageElements.MAIN.append(board);
   const boardElement = document.querySelector(`.films`);
-  sections.map((section) => render(boardElement, new FilmSection(section).getElement(), Position.BEFOREEND));
+  state.films.length > 0 ? 
+    sections.map((section) => render(boardElement, new FilmSection(section).getElement(), Position.BEFOREEND)) :
+    render(boardElement, createElement(STUB_ELEMENT), Position.BEFOREEND);
 };
 
 const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
@@ -126,21 +125,29 @@ const renderFilm = (filmData, container) => {
 
   const onEscKeyDown = (evt) => {
     if (evt.key === `Escape` || evt.key === `Esc`) {
-      filmDetails.removeElement();
+      onClosePopupClick();
       document.removeEventListener(`keydown`, onEscKeyDown);
     }
   };
-
-  const onClickClosePopup = () => filmDetails.removeElement();
-  const onClickOpenPopup = () => {
+  const onClosePopupClick = () => filmDetails.removeElement();
+  const onOpenPopupClick = () => {
     render(document.body, filmDetails.getElement(), Position.BEFOREEND);
-    filmDetails.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, onClickClosePopup);
+
+    filmDetails.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, onClosePopupClick);
+    filmDetails.getElement().querySelector(`textarea`).addEventListener(`focus`, () => {
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
+    filmDetails.getElement().querySelector(`textarea`).addEventListener(`blur`, () => {
+      document.addEventListener(`keydown`, onEscKeyDown);
+    });
+
     document.addEventListener(`keydown`, onEscKeyDown);
   };
 
-  film.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, onClickOpenPopup);
-  film.getElement().querySelector(`.film-card__title`).addEventListener(`click`, onClickOpenPopup);
-  film.getElement().querySelector(`.film-card__comments`).addEventListener(`click`, onClickOpenPopup);
+
+  film.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, onOpenPopupClick);
+  film.getElement().querySelector(`.film-card__title`).addEventListener(`click`, onOpenPopupClick);
+  film.getElement().querySelector(`.film-card__comments`).addEventListener(`click`, onOpenPopupClick);
 
   render(container, film.getElement(), Position.BEFOREEND);
 };

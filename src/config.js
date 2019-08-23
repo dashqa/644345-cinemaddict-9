@@ -1,7 +1,8 @@
 export const PIC_PATH = `./images/posters`;
 export const MAX_DESCRIPTION_LENGTH = 139;
-export const FILMS_QUANTITY = 22;
+export const FILMS_QUANTITY = 0;
 export const CARDS_PER_PAGE = 5;
+export const STUB_ELEMENT = `<p>There are no movies in our database<p>`;
 
 export const STATISTICS_FILTERS = [
   {title: `All time`, value: `all-time`, isChecked: true},
