@@ -117,8 +117,7 @@ const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
 
 const renderExtraSection = (type) => {
   const container = document.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
-  const filmsArray = findMost(state.films, type);
-  filmsArray.map((film) => renderFilm(film, container))
+  findMost(state.films, type).map((film) => renderFilm(film, container))
 };
 
 const renderFilm = (filmData, container) => {
@@ -154,7 +153,7 @@ const renderFilms = () => {
 
 render(PageElements.HEADER, search.getElement(), Position.BEFOREEND);
 render(PageElements.HEADER, profile.getElement(), Position.BEFOREEND);
-render(PageElements.MAIN, renderFilters(state.filters), Position.BEFOREEND);
+renderFilters(state.filters);
 render(PageElements.MAIN, sorting.getElement(), Position.BEFOREEND);
 renderFilmSections(FILM_SECTIONS);
 renderFilms();

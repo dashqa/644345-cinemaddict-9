@@ -1,5 +1,4 @@
 import {Position} from './config';
-import FilmSection from "./components/film-section";
 
 export const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 export const getRandomFloat = (min, max) => Math.random() * (max - min) + min;
