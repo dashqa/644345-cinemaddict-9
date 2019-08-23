@@ -1,6 +1,6 @@
 export const PIC_PATH = `./images/posters`;
 export const MAX_DESCRIPTION_LENGTH = 139;
-export const FILMS_QUANTITY = 0;
+export const FILMS_QUANTITY = 10;
 export const CARDS_PER_PAGE = 5;
 export const STUB_ELEMENT = `<p>There are no movies in our database<p>`;
 
