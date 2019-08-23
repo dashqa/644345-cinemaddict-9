@@ -36,7 +36,7 @@ class Card extends DefaultComponent {
       </form>
     </article>
     `.trim();
-  };
+  }
 }
 
 export default Card;

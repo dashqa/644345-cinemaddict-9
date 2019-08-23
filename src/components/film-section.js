@@ -17,7 +17,7 @@ class FilmSection extends DefaultComponent {
         ${!this._isExtra ? `<button class="films-list__show-more">Show more</button>` : ``}
       </section>
     `.trim();
-  };
+  }
 }
 
 export default FilmSection;

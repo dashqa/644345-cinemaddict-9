@@ -3,7 +3,7 @@ import DefaultComponent from './default-component';
 
 class CardDetails extends DefaultComponent {
   constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genres,
-   description, picture, comments}) {
+    description, picture, comments}) {
     super();
     this._title = title;
     this._originalTitle = originalTitle;
@@ -22,7 +22,7 @@ class CardDetails extends DefaultComponent {
   }
 
   getRatingScoreTemplate() {
-    return [...Array(9)].map((_,i) => {
+    return [...Array(9)].map((_, i) => {
       const value = i + 1;
       return `
       <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${value}" 
@@ -185,7 +185,7 @@ class CardDetails extends DefaultComponent {
       </form>
     </section>
     `.trim();
-  };
+  }
 }
 
 export default CardDetails;

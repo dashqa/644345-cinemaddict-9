@@ -55,7 +55,7 @@ class Statistics extends DefaultComponent {
       </div>
      </section>
    `.trim();
-  };
+  }
 }
 
 export default Statistics;
