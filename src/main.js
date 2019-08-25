@@ -1,6 +1,6 @@
 import {generateFilmData} from './data/mock';
-import {getRandomArray, getSortingValue, render} from './utils';
-import {FILM_SECTIONS, PageElements, Position, FILMS_QUANTITY, CARDS_PER_PAGE} from './config';
+import {getRandomArray, getSortingValue, render, createElement} from './utils';
+import {PageElements, Position, FILM_SECTIONS, STUB_ELEMENT, FILMS_QUANTITY, CARDS_PER_PAGE} from './config';
 import Card from './components/film-card';
 import CardDetails from './components/film-details';
 import Profile from './components/profile';
@@ -65,9 +65,6 @@ const state = {
       topGenre: `-`,
     }]
   },
-  get leftToShow() {
-    return this.films.length - this.quantityCounter;
-  },
   updateQuantityCounter(quantity) {
     this.quantityCounter += quantity;
   },
@@ -93,7 +90,7 @@ const renderFilters = (filters) => {
   nav.classList.add(`main-navigation`);
   PageElements.MAIN.append(nav);
   const navElement = document.querySelector(`.main-navigation`);
-  filters.map((filter) => render(navElement, new Filter(filter).getElement(), Position.BEFOREEND));
+  filters.forEach((filter) => render(navElement, new Filter(filter).getElement(), Position.BEFOREEND));
 };
 
 const renderFilmSections = (sections) => {
@@ -101,14 +98,16 @@ const renderFilmSections = (sections) => {
   board.classList.add(`films`);
   PageElements.MAIN.append(board);
   const boardElement = document.querySelector(`.films`);
-  sections.map((section) => render(boardElement, new FilmSection(section).getElement(), Position.BEFOREEND));
+  state.films.length ?
+    sections.forEach((section) => render(boardElement, new FilmSection(section).getElement(), Position.BEFOREEND)) :
+    render(boardElement, createElement(STUB_ELEMENT), Position.BEFOREEND);
 };
 
 const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
   const container = document.querySelectorAll(`.films-list__container`)[0];
   filmsForRender = state.films.slice(start, end);
   state.updateQuantityCounter(filmsForRender.length);
-  filmsForRender.map((film) => renderFilm(film, container));
+  filmsForRender.forEach((film) => renderFilm(film, container));
 
   if (state.quantityCounter >= FILMS_QUANTITY || FILMS_QUANTITY < CARDS_PER_PAGE) {
     buttonElement.remove();
@@ -117,32 +116,39 @@ const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
 
 const renderExtraSection = (type) => {
   const container = document.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
-  findMost(state.films, type).map((film) => renderFilm(film, container))
+  findMost(state.films, type).forEach((film) => renderFilm(film, container))
 };
 
 const renderFilm = (filmData, container) => {
   const film = new Card(filmData);
   const filmDetails = new CardDetails(filmData);
+  const filmComponent = film.getElement();
 
   const onEscKeyDown = (evt) => {
     if (evt.key === `Escape` || evt.key === `Esc`) {
-      filmDetails.removeElement();
+      onClosePopupClick();
       document.removeEventListener(`keydown`, onEscKeyDown);
     }
   };
+  const onClosePopupClick = () => filmDetails.removeElement();
+  const onOpenPopupClick = () => {
+    const filmDetailsComponent = filmDetails.getElement();
+    render(document.body, filmDetailsComponent, Position.BEFOREEND);
 
-  const onClickClosePopup = () => filmDetails.removeElement();
-  const onClickOpenPopup = () => {
-    render(document.body, filmDetails.getElement(), Position.BEFOREEND);
-    filmDetails.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, onClickClosePopup);
+    const textareaElement = filmDetailsComponent.querySelector(`.film-details__comment-input`);
+    filmDetailsComponent.querySelector(`.film-details__close-btn`).addEventListener(`click`, onClosePopupClick);
+    textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, onEscKeyDown));
+    textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, onEscKeyDown));
+
     document.addEventListener(`keydown`, onEscKeyDown);
   };
 
-  film.getElement().querySelector(`.film-card__poster`).addEventListener(`click`, onClickOpenPopup);
-  film.getElement().querySelector(`.film-card__title`).addEventListener(`click`, onClickOpenPopup);
-  film.getElement().querySelector(`.film-card__comments`).addEventListener(`click`, onClickOpenPopup);
 
-  render(container, film.getElement(), Position.BEFOREEND);
+  filmComponent.querySelector(`.film-card__poster`).addEventListener(`click`, onOpenPopupClick);
+  filmComponent.querySelector(`.film-card__title`).addEventListener(`click`, onOpenPopupClick);
+  filmComponent.querySelector(`.film-card__comments`).addEventListener(`click`, onOpenPopupClick);
+
+  render(container, filmComponent, Position.BEFOREEND);
 };
 
 const renderFilms = () => {
