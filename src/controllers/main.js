@@ -17,7 +17,7 @@ class MainController {
     this._filters = filters;
     this._sections = sections;
     this._nav = new NavMenu();
-    this._sorting = new Sorting;
+    this._sorting = new Sorting();
     this._board = new Board(this._films.length);
     this._showMore = new ShowMore();
   }
@@ -31,7 +31,9 @@ class MainController {
     this._renderMainSection(this._films);
     this._renderExtraSection(`rating`);
     this._renderExtraSection(`comments`);
-    this._films.length > CARDS_PER_PAGE ? this._renderShowMore(CARDS_PER_PAGE) : ``;
+    if (this._films.length > CARDS_PER_PAGE) {
+      this._renderShowMore(CARDS_PER_PAGE);
+    }
   }
 
   _renderFilters() {
@@ -82,7 +84,7 @@ class MainController {
 
   _renderExtraSection(type) {
     const container = document.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
-    findMostFilm(this._films, type).forEach((film) => this._renderFilm(film, container))
+    findMostFilm(this._films, type).forEach((film) => this._renderFilm(film, container));
   }
 
   _renderShowMore() {
@@ -95,7 +97,9 @@ class MainController {
       const end = quantityCounter + CARDS_PER_PAGE;
       quantityCounter = end;
 
-      quantityCounter >= this._films.length ? this._showMore.removeElement() : ``;
+      if (quantityCounter >= this._films.length) {
+        this._showMore.removeElement();
+      }
       this._renderMainSection(this._films, start, end);
     };
     this._showMore.getElement().addEventListener(`click`, onClickMoreButton);
