@@ -1,20 +1,13 @@
+import MainController from './controllers/main';
+import HeaderController from './controllers/header';
 import {generateFilmData} from './data/mock';
-import {getRandomArray, getSortingValue, render, createElement} from './utils';
-import {PageElements, Position, FILM_SECTIONS, STUB_ELEMENT, FILMS_QUANTITY, CARDS_PER_PAGE} from './config';
-import Card from './components/film-card';
-import CardDetails from './components/film-details';
-import Profile from './components/profile';
-import Search from './components/search';
-import Sorting from './components/sorting';
-import Filter from './components/filter';
-import FilmSection from './components/film-section';
+import {PageElement, FILMS_QUANTITY, FILM_SECTIONS} from './config';
+
 
 const filmsData = [...Array(FILMS_QUANTITY)].map(generateFilmData);
-let filmsForRender = [];
 
 const state = {
   films: JSON.parse(JSON.stringify(filmsData)),
-  quantityCounter: 0,
   userRating: 0,
   watchlist: [],
   watched: [],
@@ -65,114 +58,11 @@ const state = {
       topGenre: `-`,
     }]
   },
-  updateQuantityCounter(quantity) {
-    this.quantityCounter += quantity;
-  },
 };
+const headerController = new HeaderController(PageElement.HEADER, state.userRating);
+const mainController = new MainController(PageElement.MAIN, state.films, state.filters, FILM_SECTIONS);
 
-const search = new Search;
-const profile = new Profile(state.userRating);
-const sorting = new Sorting;
-
-const findMost = (array, findBy) => {
-  const sorted = array.sort((a, b) => getSortingValue(b, findBy) - getSortingValue(a, findBy));
-  const first = getSortingValue(sorted[0], findBy);
-  const last = getSortingValue(sorted[sorted.length - 1],findBy);
-
-  if (first && last !== 0) {
-    return first === last ? getRandomArray(sorted, 2) : sorted.slice(0, 2);
-  }
-  return null;
-};
-
-const renderFilters = (filters) => {
-  const nav = document.createElement(`nav`);
-  nav.classList.add(`main-navigation`);
-  PageElements.MAIN.append(nav);
-  const navElement = document.querySelector(`.main-navigation`);
-  filters.forEach((filter) => render(navElement, new Filter(filter).getElement(), Position.BEFOREEND));
-};
-
-const renderFilmSections = (sections) => {
-  const board = document.createElement(`section`);
-  board.classList.add(`films`);
-  PageElements.MAIN.append(board);
-  const boardElement = document.querySelector(`.films`);
-  state.films.length ?
-    sections.forEach((section) => render(boardElement, new FilmSection(section).getElement(), Position.BEFOREEND)) :
-    render(boardElement, createElement(STUB_ELEMENT), Position.BEFOREEND);
-};
-
-const renderMainSection = (start = 0, end = CARDS_PER_PAGE) => {
-  const container = document.querySelectorAll(`.films-list__container`)[0];
-  filmsForRender = state.films.slice(start, end);
-  state.updateQuantityCounter(filmsForRender.length);
-  filmsForRender.forEach((film) => renderFilm(film, container));
-
-  if (state.quantityCounter >= FILMS_QUANTITY || FILMS_QUANTITY < CARDS_PER_PAGE) {
-    buttonElement.remove();
-  }
-};
-
-const renderExtraSection = (type) => {
-  const container = document.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
-  findMost(state.films, type).forEach((film) => renderFilm(film, container))
-};
-
-const renderFilm = (filmData, container) => {
-  const film = new Card(filmData);
-  const filmDetails = new CardDetails(filmData);
-  const filmComponent = film.getElement();
-
-  const onEscKeyDown = (evt) => {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
-      onClosePopupClick();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
-  const onClosePopupClick = () => filmDetails.removeElement();
-  const onOpenPopupClick = () => {
-    const filmDetailsComponent = filmDetails.getElement();
-    render(document.body, filmDetailsComponent, Position.BEFOREEND);
-
-    const textareaElement = filmDetailsComponent.querySelector(`.film-details__comment-input`);
-    filmDetailsComponent.querySelector(`.film-details__close-btn`).addEventListener(`click`, onClosePopupClick);
-    textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, onEscKeyDown));
-    textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, onEscKeyDown));
-
-    document.addEventListener(`keydown`, onEscKeyDown);
-  };
-
-
-  filmComponent.querySelector(`.film-card__poster`).addEventListener(`click`, onOpenPopupClick);
-  filmComponent.querySelector(`.film-card__title`).addEventListener(`click`, onOpenPopupClick);
-  filmComponent.querySelector(`.film-card__comments`).addEventListener(`click`, onOpenPopupClick);
-
-  render(container, filmComponent, Position.BEFOREEND);
-};
-
-const renderFilms = () => {
-  renderMainSection();
-  renderExtraSection(`rating`);
-  renderExtraSection(`comments`);
-};
-
-render(PageElements.HEADER, search.getElement(), Position.BEFOREEND);
-render(PageElements.HEADER, profile.getElement(), Position.BEFOREEND);
-renderFilters(state.filters);
-render(PageElements.MAIN, sorting.getElement(), Position.BEFOREEND);
-renderFilmSections(FILM_SECTIONS);
-renderFilms();
-
-const onClickMoreButton = () => {
-  const start = state.quantityCounter;
-  const end = state.quantityCounter + CARDS_PER_PAGE;
-  renderMainSection(start, end);
-};
-
-const buttonElement = document.querySelector(`.films-list__show-more`);
-buttonElement.addEventListener(`click`, onClickMoreButton);
-
-
+headerController.init();
+mainController.init();
 
 export default state;

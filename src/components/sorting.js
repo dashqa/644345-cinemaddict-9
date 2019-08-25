@@ -1,10 +1,6 @@
-import DefaultComponent from "./default-component";
+import DefaultComponent from './default-component';
 
 class Sorting extends DefaultComponent {
-  constructor() {
-    super();
-  }
-
   getTemplate() {
     return `
       <ul class="sort">

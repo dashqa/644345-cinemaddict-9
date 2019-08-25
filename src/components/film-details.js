@@ -1,7 +1,7 @@
 import {PIC_PATH} from '../config';
 import DefaultComponent from './default-component';
 
-class CardDetails extends DefaultComponent {
+class FilmCardDetails extends DefaultComponent {
   constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genres,
     description, picture, comments}) {
     super();
@@ -188,4 +188,4 @@ class CardDetails extends DefaultComponent {
   }
 }
 
-export default CardDetails;
+export default FilmCardDetails;

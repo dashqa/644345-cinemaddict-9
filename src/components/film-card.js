@@ -2,7 +2,7 @@ import {truncateString} from '../utils';
 import {PIC_PATH, MAX_DESCRIPTION_LENGTH} from '../config';
 import DefaultComponent from "./default-component";
 
-class Card extends DefaultComponent {
+class FilmCard extends DefaultComponent {
   constructor({title, rating, year, duration, genres, picture, description, comments}) {
     super();
     this._title = title;
@@ -39,5 +39,5 @@ class Card extends DefaultComponent {
   }
 }
 
-export default Card;
+export default FilmCard;
 

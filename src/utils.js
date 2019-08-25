@@ -43,3 +43,14 @@ export const unrender = (element) => {
   }
 };
 
+export const findMostFilm = (array, findBy) => {
+  const sorted = array.sort((a, b) => getSortingValue(b, findBy) - getSortingValue(a, findBy));
+  const first = getSortingValue(sorted[0], findBy);
+  const last = getSortingValue(sorted[sorted.length - 1],findBy);
+
+  if (first && last !== 0) {
+    return first === last ? getRandomArray(sorted, 2) : sorted.slice(0, 2);
+  }
+  return null;
+};
+
