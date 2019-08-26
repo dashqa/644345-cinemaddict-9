@@ -1,10 +1,6 @@
 import DefaultComponent from './default-component';
 
 class Search extends DefaultComponent {
-  constructor() {
-    super();
-  }
-
   getTemplate() {
     return `
       <form class="header__search search">

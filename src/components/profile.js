@@ -1,4 +1,4 @@
-import {RATINGS} from "../config";
+import {RATINGS} from '../config';
 import DefaultComponent from './default-component';
 
 class Profile extends DefaultComponent {

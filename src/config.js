@@ -1,8 +1,7 @@
 export const PIC_PATH = `./images/posters`;
 export const MAX_DESCRIPTION_LENGTH = 139;
-export const FILMS_QUANTITY = 10;
+export const FILMS_QUANTITY = 14;
 export const CARDS_PER_PAGE = 5;
-export const STUB_ELEMENT = `<p>There are no movies in our database<p>`;
 
 export const STATISTICS_FILTERS = [
   {title: `All time`, value: `all-time`, isChecked: true},
@@ -28,7 +27,8 @@ export const Position = {
   BEFOREEND: `beforeend`
 };
 
-export const PageElements = {
+export const PageElement = {
+  BODY: document.querySelector(`body`),
   MAIN: document.querySelector(`.main`),
   HEADER: document.querySelector(`.header`),
   // NAV: document.querySelector(`.main-navigation`),
