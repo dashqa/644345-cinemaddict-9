@@ -127,6 +127,7 @@ class MainController {
         case `default`:
           return this._films;
       }
+      return null;
     };
     container.innerHTML = ``;
     this._showMore.removeElement();
