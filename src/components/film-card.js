@@ -3,7 +3,7 @@ import {PIC_PATH, MAX_DESCRIPTION_LENGTH} from '../config';
 import DefaultComponent from "./default-component";
 
 class FilmCard extends DefaultComponent {
-  constructor({title, rating, year, duration, genres, picture, description, comments}) {
+  constructor({title, rating, year, duration, genres, picture, description, comments, inWatchlist, isWatched, isFavorite}) {
     super();
     this._title = title;
     this._rating = rating;
@@ -13,6 +13,9 @@ class FilmCard extends DefaultComponent {
     this._picture = picture;
     this._description = description;
     this._commentsQuantity = comments.length;
+    this._inWatchlist = inWatchlist;
+    this._isWatched = isWatched;
+    this._isFavorite = isFavorite;
   }
 
   getTemplate() {
@@ -30,9 +33,15 @@ class FilmCard extends DefaultComponent {
       <p class="film-card__description">${truncateString(this._description, MAX_DESCRIPTION_LENGTH)}</p>
       <a class="film-card__comments">${this._commentsQuantity} comments</a>
       <form class="film-card__controls">
-        <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
-        <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
-        <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
+        <button 
+          class="film-card__controls-item button film-card__controls-item--add-to-watchlist ${this._inWatchlist ? `film-card__controls-item--active` : ``}"
+          data-action="watchlist">Add to watchlist</button>
+        <button 
+          class="film-card__controls-item button film-card__controls-item--mark-as-watched ${this._isWatched ? `film-card__controls-item--active` : ``}"
+          data-action="watched">Mark as watched</button>
+        <button 
+          class="film-card__controls-item button film-card__controls-item--favorite ${this._isFavorite ? `film-card__controls-item--active` : ``}"
+          data-action="favorite">Mark as favorite</button>
       </form>
     </article>
     `.trim();

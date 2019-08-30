@@ -22,6 +22,13 @@ export const FILM_SECTIONS = [
   {title: `Top rated movies`, isExtra: true},
   {title: `Most commented`, isExtra: true}
 ];
+
+export const FILM_DETAILS_CONTROLS = [
+  {title: `Add to watchlist`, value: `watchlist`},
+  {title: `Already watched`, value: `watched`},
+  {title: `Add to favorites`, value: `favorite`}
+];
+
 export const Position = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`

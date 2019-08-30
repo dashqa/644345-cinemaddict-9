@@ -1,9 +1,9 @@
-import {PIC_PATH} from '../config';
+import {PIC_PATH, FILM_DETAILS_CONTROLS} from '../config';
 import DefaultComponent from './default-component';
 
 class FilmCardDetails extends DefaultComponent {
   constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genres,
-    description, picture, comments}) {
+    description, picture, comments, inWatchlist, isWatched, isFavorite}) {
     super();
     this._title = title;
     this._originalTitle = originalTitle;
@@ -19,9 +19,12 @@ class FilmCardDetails extends DefaultComponent {
     this._description = description;
     this._picture = picture;
     this._comments = comments;
+    this._inWatchlist = inWatchlist;
+    this._isWatched = isWatched;
+    this._isFavorite = isFavorite;
   }
 
-  getRatingScoreTemplate() {
+  _getRatingScoreTemplate() {
     return [...Array(9)].map((_, i) => {
       const value = i + 1;
       return `
@@ -29,6 +32,17 @@ class FilmCardDetails extends DefaultComponent {
       id="rating-${value}">
       <label class="film-details__user-rating-label" for="rating-${value}">${value}</label>`.trim();
     }).join(` `);
+  }
+
+  _getDataByControlType(type) {
+    switch (type) {
+      case `watchlist`:
+        return this._inWatchlist;
+      case `watched`:
+        return this._isWatched;
+      case `favorite`:
+        return this._isFavorite;
+    }
   }
 
   getTemplate() {
@@ -97,18 +111,20 @@ class FilmCardDetails extends DefaultComponent {
           </div>
     
           <section class="film-details__controls">
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
-            <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
-    
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched">
-            <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
-    
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
-            <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
+          ${FILM_DETAILS_CONTROLS.map(({title, value}) => `
+            <input 
+              type="checkbox" 
+              class="film-details__control-input visually-hidden" 
+              id="${value}" 
+              name="${value}"
+              ${this._getDataByControlType(value) ? `checked` : ``}>
+            <label for="${value}" class="film-details__control-label film-details__control-label--${value}">${title}</label>
+          `.trim()).join(``)}
           </section>
         </div>
         
-        <div class="form-details__middle-container">
+        ${this._isWatched ? `
+          <div class="form-details__middle-container" >
           <section class="film-details__user-rating-wrap">
             <div class="film-details__user-rating-controls">
               <button class="film-details__watched-reset" type="button">Undo</button>
@@ -122,12 +138,12 @@ class FilmCardDetails extends DefaultComponent {
               <h3 class="film-details__user-rating-title">${this._title}</h3>
               <p class="film-details__user-rating-feelings">How you feel it?</p>
               <div class="film-details__user-rating-score">
-               ${this.getRatingScoreTemplate()}
+               ${this._getRatingScoreTemplate()}
               </div>
           </section>
         </div>
       </section>
-        </div>
+        </div>`.trim() : ``}
         
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">

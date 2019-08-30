@@ -3,9 +3,8 @@ import Board from '../components/board';
 import Filter from '../components/filter';
 import NavMenu from '../components/nav-menu';
 import FilmSection from '../components/film-section';
-import FilmCard from '../components/film-card';
-import FilmCardDetails from '../components/film-details';
 import ShowMore from '../components/show-more';
+import FilmController from './film';
 import {render, findMostFilm} from '../utils';
 import {CARDS_PER_PAGE, Position} from '../config';
 
@@ -20,6 +19,10 @@ class MainController {
     this._sorting = new Sorting();
     this._board = new Board(this._films.length);
     this._showMore = new ShowMore();
+
+    this._subscriptions = [];
+    this._onChangeView = this._onChangeView.bind(this);
+    this._onDataChange = this._onDataChange.bind(this);
   }
 
   init() {
@@ -48,36 +51,25 @@ class MainController {
   }
 
   _renderFilm(film, container) {
-    const filmComponent = new FilmCard(film);
-    const filmDetailsComponent = new FilmCardDetails(film);
-    const currentFilm = filmComponent.getElement();
+    const filmController = new FilmController(container, film, this._onChangeView, this._onDataChange);
+    this._subscriptions.push(filmController.setDefaultView.bind(filmController));
+  }
 
+  _reRenderMainSection(filmsArray) {
+    const container = document.querySelectorAll(`.films-list__container`)[0];
+    container.innerHTML = ``;
+    this._showMore.removeElement();
+    this._renderMainSection(filmsArray);
+    this._renderShowMore(filmsArray);
+  }
 
-    const onEscKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        onClosePopupClick();
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-    const onClosePopupClick = () => filmDetailsComponent.removeElement();
-    const onOpenPopupClick = () => {
-      const currentFilmDetails = filmDetailsComponent.getElement();
-      render(document.body, currentFilmDetails, Position.BEFOREEND);
+  _onChangeView() {
+    this._subscriptions.forEach((subscription) => subscription());
+  }
 
-      const textareaElement = currentFilmDetails.querySelector(`.film-details__comment-input`);
-      currentFilmDetails.querySelector(`.film-details__close-btn`).addEventListener(`click`, onClosePopupClick);
-      textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, onEscKeyDown));
-      textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, onEscKeyDown));
-
-      document.addEventListener(`keydown`, onEscKeyDown);
-    };
-
-
-    currentFilm.querySelector(`.film-card__poster`).addEventListener(`click`, onOpenPopupClick);
-    currentFilm.querySelector(`.film-card__title`).addEventListener(`click`, onOpenPopupClick);
-    currentFilm.querySelector(`.film-card__comments`).addEventListener(`click`, onOpenPopupClick);
-
-    render(container, currentFilm, Position.BEFOREEND);
+  _onDataChange(newData, oldData) {
+    this._films[this._films.indexOf(oldData)] = newData;
+    this._reRenderMainSection(this._films);
   }
 
   _renderMainSection(filmsArray, start = 0, end = CARDS_PER_PAGE) {
@@ -87,7 +79,7 @@ class MainController {
 
   _renderExtraSection(type) {
     const container = document.querySelectorAll(`.films-list__container`)[type === `rating` ? 1 : 2];
-    findMostFilm(this._films, type).forEach((film) => this._renderFilm(film, container));
+    findMostFilm([...this._films], type).forEach((film) => this._renderFilm(film, container));
   }
 
   _renderShowMore(filmsArray) {
@@ -105,7 +97,6 @@ class MainController {
       if (quantityCounter >= filmsArray.length) {
         showMoreElement.classList.add(`visually-hidden`);
       }
-
       this._renderMainSection(filmsArray, start, end);
     };
     showMoreElement.addEventListener(`click`, onClickMoreButton);
@@ -117,7 +108,6 @@ class MainController {
       return;
     }
 
-    const container = document.querySelectorAll(`.films-list__container`)[0];
     const getSortedFilmsArray = () => {
       switch (evt.target.dataset.sortType) {
         case `date`:
@@ -127,17 +117,13 @@ class MainController {
         case `default`:
           return this._films;
       }
-      return null;
     };
-    container.innerHTML = ``;
-    this._showMore.removeElement();
 
     document.querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
     evt.target.classList.add(`sort__button--active`);
 
     const sortedFilms = getSortedFilmsArray();
-    this._renderMainSection(sortedFilms);
-    this._renderShowMore(sortedFilms);
+    this._reRenderMainSection(sortedFilms);
   }
 }
 
