@@ -1,9 +1,9 @@
 import {truncateString} from '../utils';
-import {PIC_PATH, MAX_DESCRIPTION_LENGTH} from '../config';
+import {PIC_PATH, MAX_DESCRIPTION_LENGTH, FILM_CONTROLS} from '../config';
 import DefaultComponent from "./default-component";
 
 class FilmCard extends DefaultComponent {
-  constructor({title, rating, year, duration, genres, picture, description, comments}) {
+  constructor({title, rating, year, duration, genres, picture, description, comments, inWatchlist, isWatched, isFavorite, userRating}) {
     super();
     this._title = title;
     this._rating = rating;
@@ -13,6 +13,22 @@ class FilmCard extends DefaultComponent {
     this._picture = picture;
     this._description = description;
     this._commentsQuantity = comments.length;
+    this._inWatchlist = inWatchlist;
+    this._isWatched = isWatched;
+    this._isFavorite = isFavorite;
+    this._userRating = userRating;
+  }
+
+  _getDataByControlType(type) {
+    switch (type) {
+      case `watchlist`:
+        return this._inWatchlist;
+      case `watched`:
+        return this._isWatched;
+      case `favorite`:
+        return this._isFavorite;
+    }
+    return null;
   }
 
   getTemplate() {
@@ -30,9 +46,11 @@ class FilmCard extends DefaultComponent {
       <p class="film-card__description">${truncateString(this._description, MAX_DESCRIPTION_LENGTH)}</p>
       <a class="film-card__comments">${this._commentsQuantity} comments</a>
       <form class="film-card__controls">
-        <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
-        <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
-        <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
+      ${FILM_CONTROLS.map(({title, value, button}) => `
+       <button 
+          class="film-card__controls-item button film-card__controls-item--${button} ${this._getDataByControlType(value) ? `film-card__controls-item--active` : ``}"
+          data-action="${value}">${title}</button>
+      `.trim()).join(``)}
       </form>
     </article>
     `.trim();

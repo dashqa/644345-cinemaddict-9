@@ -2,6 +2,7 @@ export const PIC_PATH = `./images/posters`;
 export const MAX_DESCRIPTION_LENGTH = 139;
 export const FILMS_QUANTITY = 14;
 export const CARDS_PER_PAGE = 5;
+export const EMOJIS = [`smile`, `sleeping`, `puke`, `angry`];
 
 export const STATISTICS_FILTERS = [
   {title: `All time`, value: `all-time`, isChecked: true},
@@ -22,6 +23,13 @@ export const FILM_SECTIONS = [
   {title: `Top rated movies`, isExtra: true},
   {title: `Most commented`, isExtra: true}
 ];
+
+export const FILM_CONTROLS = [
+  {title: `Add to watchlist`, value: `watchlist`, button: `add-to-watchlist`},
+  {title: `Already watched`, value: `watched`, button: `mark-as-watched`},
+  {title: `Add to favorites`, value: `favorite`, button: `favorite`}
+];
+
 export const Position = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`

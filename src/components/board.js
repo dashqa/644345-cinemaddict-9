@@ -9,7 +9,7 @@ class Board extends DefaultComponent {
   getTemplate() {
     return `
       <section class="films">
-        ${!this._quantity ? `<p>There are no movies in our database</p>`.trim() : ``}
+        ${!this._quantity ? `<div class="no-result">There are no movies in our database.</div>`.trim() : ``}
       </section>`.trim();
   }
 }
