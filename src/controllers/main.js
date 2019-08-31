@@ -30,16 +30,19 @@ class MainController {
     this._renderFilters();
     render(this._container, this._sorting.getElement(), Position.BEFOREEND);
     render(this._container, this._board.getElement(), Position.BEFOREEND);
-    this._renderFilmSections();
-    this._renderMainSection(this._films);
-    this._renderExtraSection(`rating`);
-    this._renderExtraSection(`comments`);
-    if (this._films.length > CARDS_PER_PAGE) {
-      this._renderShowMore(this._films);
-    }
 
-    this._sorting.getElement()
-      .addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
+    if (this._films.length) {
+      this._renderFilmSections();
+      this._renderMainSection(this._films);
+      this._renderExtraSection(`rating`);
+      this._renderExtraSection(`comments`);
+      if (this._films.length > CARDS_PER_PAGE) {
+        this._renderShowMore(this._films);
+      }
+
+      this._sorting.getElement()
+        .addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
+    }
   }
 
   _renderFilters() {
@@ -117,6 +120,7 @@ class MainController {
         case `default`:
           return this._films;
       }
+      return null;
     };
 
     document.querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
