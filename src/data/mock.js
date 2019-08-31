@@ -1,4 +1,4 @@
-import {getRandomInt, getRandomFloat, getRandomArray, getRandomItem} from './../utils';
+import {getRandomInt, getRandomFloat, getRandomArray, getRandomItem, getRandomDate} from './../utils';
 
 const TITLES = [`Fast & Furious Presents: Hobbs & Shaw`, `Scary Stories to Tell in the Dark`, `The Lion King`,
   `Dora and the Lost City of Gold`, `Once Upon a Time ... in Hollywood`, `The Art of Racing in the Rain`,
@@ -24,8 +24,8 @@ export const generateFilmData = () => ({
   get rating() {
     return getRandomFloat(0, MAX_RATING).toFixed(1);
   },
-  get year() {
-    return getRandomInt(1900, 2019);
+  get releaseDate() {
+    return getRandomDate(new Date(1900, 0, 1), new Date());
   },
   get genres() {
     const tempSet = new Set();
@@ -45,15 +45,15 @@ export const generateFilmData = () => ({
   comments: [{
     text: `Это комментарий`,
     author: `Неопознанная мышь`,
-    date: Date.now(),
-    reaction: 5,
+    date: getRandomDate(new Date(1900, 0, 1), new Date()),
+    emotion: `smile`,
   }, {
     text: `Это комментарий 2`,
     author: `Неопознанный енот`,
-    date: Date.now(),
-    reaction: 2,
+    date: getRandomDate(new Date(1900, 0, 1), new Date()),
+    emotion: `puke`,
   }],
-  duration: `1h 55m`
+  duration: 90,
 });
 
 
