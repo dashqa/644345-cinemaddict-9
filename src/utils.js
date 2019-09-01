@@ -4,6 +4,10 @@ export const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min 
 export const getRandomFloat = (min, max) => Math.random() * (max - min) + min;
 export const truncateString = (string, length) => string.length > length ? string.substring(0, length) + '...' : string;
 
+export const getRandomDate = (start, end) => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString().slice(0,10);
+};
+
 export const getRandomItem = (targetArray = []) =>
   targetArray[Math.floor(Math.random() * Math.floor(targetArray.length - 1))];
 

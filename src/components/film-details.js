@@ -1,6 +1,8 @@
 import {PIC_PATH, FILM_CONTROLS, EMOJIS} from '../config';
 import {unrender} from '../utils';
 import DefaultComponent from './default-component';
+import moment from 'moment';
+import 'moment-duration-format';
 
 class FilmCardDetails extends DefaultComponent {
   constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genres,
@@ -34,13 +36,31 @@ class FilmCardDetails extends DefaultComponent {
     this._subscribeOnEvents();
   }
 
+  _humanizeTime(date) {
+    const inMinutes = moment().diff(date, `minutes`);
+    switch (true) {
+      case inMinutes < 1:
+        return `now`;
+      case inMinutes <= 3:
+        return `a minute ago`;
+      case inMinutes <= 59:
+        return `a few minutes ago`;
+      case inMinutes <= 119:
+        return `an hour ago`;
+      case inMinutes <= 1439:
+        return `a few hours ago`;
+      case inMinutes >= 1440:
+        return moment(date).fromNow();
+    }
+    return null;
+  }
+
   _getRatingScoreTemplate() {
     return [...Array(9)].map((_, i) => {
       const value = i + 1;
       return `
       <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${value}" 
-      id="rating-${value}"
-      ${parseInt(this._userRating, 10) === i ? `checked` : ``}>
+      id="rating-${value}">
       <label class="film-details__user-rating-label" for="rating-${value}">${value}</label>`.trim();
     }).join(` `);
   }
@@ -76,7 +96,7 @@ class FilmCardDetails extends DefaultComponent {
             <p class="film-details__comment-text">${evt.target.value}</p>
             <p class="film-details__comment-info">
               <span class="film-details__comment-author">автор</span>
-              <span class="film-details__comment-day">${new Date()} 3 days ago</span>
+              <span class="film-details__comment-day">${this._humanizeTime(new Date())}</span>
               <button class="film-details__comment-delete">Delete</button>
             </p>
           </div>
@@ -112,30 +132,30 @@ class FilmCardDetails extends DefaultComponent {
 
     if (filmDetailsMiddle) {
       unrender(filmDetailsMiddle);
-    } else {
-      this._element.querySelector(`.form-details__top-container`)
-        .insertAdjacentHTML(`afterend`, `<div class="form-details__middle-container">
-          <section class="film-details__user-rating-wrap">
-            <div class="film-details__user-rating-controls">
-              <button class="film-details__watched-reset" type="button">Undo</button>
-            </div>
-            <div class="film-details__user-score">
-              <div class="film-details__user-rating-poster">
-              <img src="${PIC_PATH}/${this._picture}" alt="film-poster" class="film-details__user-rating-img">
-             </div>
-             
-             <section class="film-details__user-rating-inner">
-              <h3 class="film-details__user-rating-title">${this._title}</h3>
-              <p class="film-details__user-rating-feelings">How you feel it?</p>
-              <div class="film-details__user-rating-score">
-               ${this._getRatingScoreTemplate()}
-              </div>
-             </section>
+    }
+
+    this._element.querySelector(`.form-details__top-container`)
+      .insertAdjacentHTML(`afterend`, `<div class="form-details__middle-container">
+        <section class="film-details__user-rating-wrap">
+          <div class="film-details__user-rating-controls">
+            <button class="film-details__watched-reset" type="button">Undo</button>
+          </div>
+          <div class="film-details__user-score">
+            <div class="film-details__user-rating-poster">
+            <img src="${PIC_PATH}/${this._picture}" alt="film-poster" class="film-details__user-rating-img">
+           </div>
+           
+           <section class="film-details__user-rating-inner">
+            <h3 class="film-details__user-rating-title">${this._title}</h3>
+            <p class="film-details__user-rating-feelings">How you feel it?</p>
+            <div class="film-details__user-rating-score">
+             ${this._getRatingScoreTemplate()}
             </div>
            </section>
-         </div>`);
-      this._element.querySelector(`.film-details__watched-reset`).addEventListener(`click`, this._onResetUserRating);
-    }
+          </div>
+         </section>
+       </div>`);
+    this._element.querySelector(`.film-details__watched-reset`).addEventListener(`click`, this._onResetUserRating);
   }
 
   _subscribeOnEvents() {
@@ -189,11 +209,11 @@ class FilmCardDetails extends DefaultComponent {
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${this._releaseDate}</td>
+                  <td class="film-details__cell">${moment(this._releaseDate).format(`DD MMM YYYY`)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${this._duration}</td>
+                  <td class="film-details__cell">${moment.duration(this._duration, `minutes`).format(`h[h] m[m]`)}</td>
                 </tr>
                 <tr class="film-details__row">
                   <td class="film-details__term">Country</td>
@@ -254,16 +274,16 @@ class FilmCardDetails extends DefaultComponent {
             <span class="film-details__comments-count">${this._comments.length}</span></h3>
         
             <ul class="film-details__comments-list">
-            ${this._comments.map(({text, author, date}) => `
+            ${this._comments.map(({text, author, date, emotion}) => `
               <li class="film-details__comment">
                 <span class="film-details__comment-emoji">
-                  <img src="./images/emoji/smile.png" width="55" height="55" alt="emoji">
+                  <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
                 </span>
                 <div>
                   <p class="film-details__comment-text">${text}</p>
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${author}</span>
-                    <span class="film-details__comment-day">${date} 3 days ago</span>
+                    <span class="film-details__comment-day">${this._humanizeTime(date)}</span>
                     <button class="film-details__comment-delete">Delete</button>
                   </p>
                 </div>
