@@ -21,8 +21,11 @@ class MainController {
     this._showMore = new ShowMore();
 
     this._subscriptions = [];
+    this._initialFilms = [...this._films];
+    this._showedTasks = CARDS_PER_PAGE;
     this._onChangeView = this._onChangeView.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
+    this._onClickMoreButton = this._onClickMoreButton.bind(this);
   }
 
   init() {
@@ -33,11 +36,11 @@ class MainController {
 
     if (this._films.length) {
       this._renderFilmSections();
-      this._renderMainSection(this._films);
+      this._renderMainSection();
       this._renderExtraSection(`rating`);
       this._renderExtraSection(`comments`);
-      if (this._films.length > CARDS_PER_PAGE) {
-        this._renderShowMore(this._films);
+      if (this._showedTasks < this._films.length) {
+        this._renderShowMore();
       }
 
       this._sorting.getElement()
@@ -53,7 +56,7 @@ class MainController {
     this._sections.forEach((section) => render(this._board.getElement(), new FilmSection(section).getElement(), Position.BEFOREEND));
   }
 
-  _renderFilm(film, container) {
+  _renderFilm(film, container = document.querySelectorAll(`.films-list__container`)[0]) {
     const filmController = new FilmController(container, film, this._onChangeView, this._onDataChange);
     this._subscriptions.push(filmController.setDefaultView.bind(filmController));
   }
@@ -76,9 +79,8 @@ class MainController {
     this._reRenderMainSection(this._films);
   }
 
-  _renderMainSection(filmsArray, start = 0, end = CARDS_PER_PAGE) {
-    const container = document.querySelectorAll(`.films-list__container`)[0];
-    filmsArray.slice(start, end).forEach((film) => this._renderFilm(film, container));
+  _renderMainSection() {
+    this._films.slice(0, CARDS_PER_PAGE).forEach((film) => this._renderFilm(film));
   }
 
   _renderExtraSection(type) {
@@ -86,24 +88,22 @@ class MainController {
     findMostFilm([...this._films], type).forEach((film) => this._renderFilm(film, container));
   }
 
-  _renderShowMore(filmsArray) {
+  _onClickMoreButton() {
+    this._films.slice(this._showedTasks, this._showedTasks + CARDS_PER_PAGE).forEach((film) => this._renderFilm(film));
+    this._showedTasks += CARDS_PER_PAGE;
+
+    if (this._showedTasks >= this._films.length) {
+      unrender(this._showMore.getElement());
+      this._showMore.removeElement();
+    }
+  }
+
+  _renderShowMore() {
     const filmList = document.querySelector(`.films-list`);
     const showMoreElement = this._showMore.getElement();
-    let quantityCounter = CARDS_PER_PAGE;
 
     render(filmList, showMoreElement, Position.BEFOREEND);
-
-    const onClickMoreButton = () => {
-      const start = quantityCounter;
-      const end = quantityCounter + CARDS_PER_PAGE;
-      quantityCounter = end;
-
-      if (quantityCounter >= filmsArray.length) {
-        unrender(showMoreElement);
-      }
-      this._renderMainSection(filmsArray, start, end);
-    };
-    showMoreElement.addEventListener(`click`, onClickMoreButton);
+    showMoreElement.addEventListener(`click`, this._onClickMoreButton);
   }
 
   _onSortLinkClick(evt) {
@@ -112,14 +112,17 @@ class MainController {
       return;
     }
 
+    const container = document.querySelectorAll(`.films-list__container`)[0];
+    container.innerHTML = ``;
+
     const getSortedFilmsArray = () => {
       switch (evt.target.dataset.sortType) {
         case `date`:
-          return this._films.slice().sort((a, b) => b.year - a.year);
+          return this._films.slice().sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
         case `rating`:
           return this._films.slice().sort((a, b) => b.rating - a.rating);
         case `default`:
-          return this._films;
+          return this._initialFilms;
       }
       return null;
     };
@@ -127,8 +130,8 @@ class MainController {
     document.querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
     evt.target.classList.add(`sort__button--active`);
 
-    const sortedFilms = getSortedFilmsArray();
-    this._reRenderMainSection(sortedFilms);
+    this._films = getSortedFilmsArray();
+    this._films.slice(0, this._showedTasks).forEach((film) => this._renderFilm(film));
   }
 }
 
