@@ -1,6 +1,6 @@
 import FilmCard from './../components/film-card';
 import FilmCardDetails from './../components/film-details';
-import {render} from '../utils';
+import {render, unrender} from '../utils';
 import {Position} from '../config';
 
 class FilmController {
@@ -43,6 +43,8 @@ class FilmController {
     textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, this._onEscKeyDown));
     textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, this._onEscKeyDown));
     this._currentFilmDetails.querySelector(`.film-details__close-btn`).addEventListener(`click`, this._onClosePopupClick);
+    this._currentFilmDetails.querySelectorAll(`.film-details__controls`).forEach((input) =>
+      input.addEventListener(`change`, this._onControlButtonClick));
 
     this._onChangeView();
     render(document.body, this._currentFilmDetails, Position.BEFOREEND);
@@ -50,16 +52,7 @@ class FilmController {
   }
 
   _onClosePopupClick() {
-    const formData = new FormData(this._currentFilmDetails.querySelector(`.film-details__inner`));
-    const newData = {
-      userRating: formData.get(`score`),
-      inWatchlist: formData.get(`watchlist`) === `on`,
-      isWatched: formData.get(`watched`) === `on`,
-      isFavorite: formData.get(`favorite`) === `on`,
-    };
-
-    this._onDataChange(Object.assign({}, this._data, newData), this._data);
-    this.setDefaultView();
+    unrender(this._currentFilmDetails);
   }
 
   _onOpenPopupClick() {
@@ -75,12 +68,10 @@ class FilmController {
 
   _onControlButtonClick(evt) {
     evt.preventDefault();
-    evt.target.classList.toggle(`film-card__controls-item--active`);
-
     const userRate = !this._data._isWatched ? null : this._data._userRating;
 
     const getNewData = () => {
-      switch (evt.target.dataset.action) {
+      switch (evt.target.name) {
         case `watchlist`:
           return Object.assign({}, this._data, {inWatchlist: !this._data.inWatchlist});
         case `watched`:
@@ -95,7 +86,8 @@ class FilmController {
   }
 
   setDefaultView() {
-    if (document.body.contains(this._filmDetails.getElement())) {
+    if (document.body.contains(this._currentFilmDetails)) {
+      unrender(this._currentFilmDetails);
       this._filmDetails.removeElement();
     }
   }

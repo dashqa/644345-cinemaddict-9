@@ -51,7 +51,7 @@ class FilmCard extends DefaultComponent {
       ${FILM_CONTROLS.map(({title, value, button}) => `
        <button 
           class="film-card__controls-item button film-card__controls-item--${button} ${this._getDataByControlType(value) ? `film-card__controls-item--active` : ``}"
-          data-action="${value}">${title}</button>
+          name="${value}">${title}</button>
       `.trim()).join(``)}
       </form>
     </article>

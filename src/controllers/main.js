@@ -5,7 +5,7 @@ import NavMenu from '../components/nav-menu';
 import FilmSection from '../components/film-section';
 import ShowMore from '../components/show-more';
 import FilmController from './film';
-import {render, findMostFilm} from '../utils';
+import {render, unrender, findMostFilm} from '../utils';
 import {CARDS_PER_PAGE, Position} from '../config';
 
 
@@ -61,6 +61,7 @@ class MainController {
   _reRenderMainSection(filmsArray) {
     const container = document.querySelectorAll(`.films-list__container`)[0];
     container.innerHTML = ``;
+    unrender(this._showMore.getElement());
     this._showMore.removeElement();
     this._renderMainSection(filmsArray);
     this._renderShowMore(filmsArray);
@@ -98,7 +99,7 @@ class MainController {
       quantityCounter = end;
 
       if (quantityCounter >= filmsArray.length) {
-        showMoreElement.classList.add(`visually-hidden`);
+        unrender(showMoreElement);
       }
       this._renderMainSection(filmsArray, start, end);
     };
