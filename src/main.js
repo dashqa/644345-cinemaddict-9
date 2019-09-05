@@ -1,7 +1,6 @@
-import MainController from './controllers/main';
-import HeaderController from './controllers/header';
+import PageController from './controllers/page';
 import {generateFilmData} from './data/mock';
-import {PageElement, FILMS_QUANTITY, FILM_SECTIONS} from './config';
+import {PageElement, FILMS_QUANTITY} from './config';
 
 
 const filmsData = [...Array(FILMS_QUANTITY)].map(generateFilmData);
@@ -59,10 +58,8 @@ const state = {
     }]
   },
 };
-const headerController = new HeaderController(PageElement.HEADER, state.userRating);
-const mainController = new MainController(PageElement.MAIN, state.films, state.filters, FILM_SECTIONS);
 
-headerController.init();
-mainController.init();
+const pageController = new PageController(PageElement.HEADER, PageElement.MAIN, state.films, state.filters, state.statistic, state.userRating);
+pageController.init();
 
 export default state;

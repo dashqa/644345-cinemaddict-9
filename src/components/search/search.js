@@ -1,4 +1,4 @@
-import DefaultComponent from './default-component';
+import DefaultComponent from '../default-component';
 
 class Search extends DefaultComponent {
   getTemplate() {

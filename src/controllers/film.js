@@ -82,7 +82,10 @@ class FilmController {
       return null;
     };
 
+    this.setDefaultView();
+
     this._onDataChange(getNewData(), this._data);
+    this._renderFilmDetails();
   }
 
   setDefaultView() {
