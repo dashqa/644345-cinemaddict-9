@@ -1,7 +1,8 @@
 export const PIC_PATH = `./images/posters`;
 export const MAX_DESCRIPTION_LENGTH = 139;
-export const FILMS_QUANTITY = 14;
+export const FILMS_QUANTITY = 12;
 export const CARDS_PER_PAGE = 5;
+export const MIN_SEARCH_LENGTH = 3;
 export const EMOJIS = [`smile`, `sleeping`, `puke`, `angry`];
 
 export const STATISTICS_FILTERS = [
