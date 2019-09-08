@@ -1,17 +1,17 @@
 import {truncateString} from '../utils';
-import {PIC_PATH, MAX_DESCRIPTION_LENGTH, FILM_CONTROLS} from '../config';
+import {MAX_DESCRIPTION_LENGTH, FILM_CONTROLS} from '../config';
 import DefaultComponent from "./default-component";
 import moment from 'moment';
 import 'moment-duration-format';
 
 class FilmCard extends DefaultComponent {
-  constructor({title, rating, releaseDate, duration, genres, picture, description, comments, inWatchlist, isWatched, isFavorite, userRating}) {
+  constructor({title, rating, releaseDate, duration, genre, picture, description, comments, inWatchlist, isWatched, isFavorite, userRating}) {
     super();
     this._title = title;
     this._rating = rating;
     this._releaseDate = releaseDate;
     this._duration = duration;
-    this._genres = genres;
+    this._genre = genre;
     this._picture = picture;
     this._description = description;
     this._commentsQuantity = comments.length;
@@ -41,10 +41,9 @@ class FilmCard extends DefaultComponent {
       <p class="film-card__info">
         <span class="film-card__year">${moment(this._releaseDate).format(`YYYY`)}</span>
         <span class="film-card__duration">${moment.duration(this._duration, `minutes`).format(`h[h] m[m]`)}</span>
-        ${Array.from(this._genres).map((genre) => `
-        <span class="film-details__genre">${genre}</span>`.trim()).join(``)}
+        <span class="film-details__genre">${this._genre.values().next().value || `Without genre`}</span>
       </p>
-      <img src="${PIC_PATH}/${this._picture}" alt="${this._title}" class="film-card__poster">
+      <img src="${this._picture}" alt="${this._title}" class="film-card__poster">
       <p class="film-card__description">${truncateString(this._description, MAX_DESCRIPTION_LENGTH)}</p>
       <a class="film-card__comments">${this._commentsQuantity} comments</a>
       <form class="film-card__controls">

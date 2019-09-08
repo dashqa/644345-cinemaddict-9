@@ -1,23 +1,29 @@
 import FilmCard from './../components/film-card';
 import FilmCardDetails from './../components/film-details';
+import {API} from '../components/api/api';
 import {render, unrender} from '../utils';
-import {Position} from '../config';
+import {Position, Api} from '../config';
 
 class FilmController {
-  constructor(container, data, onChangeView, onDataChange) {
+  constructor(container, data, onChangeView, onDataChange, onCommentsChange) {
     this._container = container;
     this._data = data;
     this._onChangeView = onChangeView;
     this._onDataChange = onDataChange;
+    this._onCommentsChange = onCommentsChange;
     this._filmView = new FilmCard(data);
-    this._filmDetails = new FilmCardDetails(data);
     this._currentFilm = this._filmView.getElement();
-    this._currentFilmDetails = this._filmDetails.getElement();
+    this._filmDetails = {};
+
+    this._api = new API({endPoint: Api.END_POINT, authorization: Api.AUTHORIZATION});
 
     this._onClosePopupClick = this._onClosePopupClick.bind(this);
     this._onOpenPopupClick = this._onOpenPopupClick.bind(this);
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this._onControlButtonClick = this._onControlButtonClick.bind(this);
+    this._onChangeUserRating = this._onChangeUserRating.bind(this);
+    this._onCommentDelete = this._onCommentDelete.bind(this);
+    this._onAddCommentEnterKey = this._onAddCommentEnterKey.bind(this);
 
     this.init();
   }
@@ -37,26 +43,45 @@ class FilmController {
     render(this._container, this._currentFilm, Position.BEFOREEND);
   }
 
-  _renderFilmDetails() {
-    const textareaElement = this._currentFilmDetails.querySelector(`.film-details__comment-input`);
+  _onOpenPopupClick() {
+    this._initializeFilmDetails();
+  }
 
+  _onClosePopupClick() {
+    this.setDefaultView();
+  }
+
+  _initializeFilmDetails() {
+    this._api.getComments(this._data.id)
+      .then((comments) => {
+        this._filmDetails = new FilmCardDetails(this._data, comments);
+      })
+      .then(() => this._renderFilmDetails());
+  }
+
+  _renderFilmDetails() {
+    this._currentFilmDetails = this._filmDetails.getElement();
+
+    const textareaElement = this._currentFilmDetails.querySelector(`.film-details__comment-input`);
     textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, this._onEscKeyDown));
     textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, this._onEscKeyDown));
     this._currentFilmDetails.querySelector(`.film-details__close-btn`).addEventListener(`click`, this._onClosePopupClick);
     this._currentFilmDetails.querySelectorAll(`.film-details__controls`).forEach((input) =>
       input.addEventListener(`change`, this._onControlButtonClick));
+    this._currentFilmDetails.querySelector(`.film-details__comment-input`).addEventListener(`keydown`, this._onAddCommentEnterKey);
+    this._currentFilmDetails.querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
+      button.addEventListener(`click`, this._onCommentDelete);
+    });
+
+    if (this._data.isWatched) {
+      this._currentFilmDetails.querySelectorAll(`.film-details__user-rating-input`).forEach((input) =>
+        input.addEventListener(`change`, this._onChangeUserRating));
+      this._currentFilmDetails.querySelector(`.film-details__watched-reset`).addEventListener(`click`, this._onChangeUserRating);
+    }
 
     this._onChangeView();
     render(document.body, this._currentFilmDetails, Position.BEFOREEND);
     document.addEventListener(`keydown`, this._onEscKeyDown);
-  }
-
-  _onClosePopupClick() {
-    unrender(this._currentFilmDetails);
-  }
-
-  _onOpenPopupClick() {
-    this._renderFilmDetails();
   }
 
   _onEscKeyDown(evt) {
@@ -66,32 +91,72 @@ class FilmController {
     }
   }
 
+  _onChangeUserRating(evt) {
+    this._onDataChange(Object.assign(this._data, {userRating: evt.target.value || 0}));
+    this.setDetailsView();
+  }
+
+  _onCommentDelete(evt) {
+    this._onCommentsChange({action: `delete`, commentId: evt.target.dataset.id});
+    this.setDetailsView();
+  }
+
+  _onAddCommentEnterKey(evt) {
+    if (!(evt.key === `Enter` && (evt.ctrlKey || evt.metaKey))) {
+      return;
+    }
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    const checkedEmoji = [...this._filmDetails.getElement().querySelectorAll(`input[name=comment-emoji]`)]
+      .filter((input) => input.checked)[0].value;
+
+    this._onCommentsChange({
+      action: `create`,
+      comment: {
+        comment: evt.target.value,
+        date: new Date(),
+        emotion: String(checkedEmoji)
+      },
+      filmId: this._data.id
+    });
+
+    this.setDetailsView();
+  }
+
   _onControlButtonClick(evt) {
     evt.preventDefault();
-    const userRate = !this._data._isWatched ? null : this._data._userRating;
+    const userRating = !this._data.isWatched ? 0 : this._data._userRating || 0;
+    const watchedDate = this._data.isWatched ? null : new Date();
 
-    const getNewData = () => {
+    const getNewPropertysValue = () => {
       switch (evt.target.name) {
         case `watchlist`:
-          return Object.assign({}, this._data, {inWatchlist: !this._data.inWatchlist});
+          return {inWatchlist: !this._data.inWatchlist};
         case `watched`:
-          return Object.assign({}, this._data, {isWatched: !this._data.isWatched, userRating: userRate});
+          return {isWatched: !this._data.isWatched, userRating, watchedDate};
         case `favorite`:
-          return Object.assign({}, this._data, {isFavorite: !this._data.isFavorite});
+          return {isFavorite: !this._data.isFavorite};
       }
       return null;
     };
-
-    this.setDefaultView();
-
-    this._onDataChange(getNewData(), this._data);
-    this._renderFilmDetails();
+    this._onDataChange(Object.assign(this._data, getNewPropertysValue()));
+    this.setDetailsView();
   }
 
   setDefaultView() {
     if (document.body.contains(this._currentFilmDetails)) {
       unrender(this._currentFilmDetails);
       this._filmDetails.removeElement();
+    }
+  }
+
+  setDetailsView() {
+    if (document.body.contains(this._currentFilmDetails)) {
+      unrender(this._currentFilmDetails);
+      this._filmDetails.removeElement();
+
+      this._initializeFilmDetails();
     }
   }
 
