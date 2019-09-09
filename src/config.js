@@ -1,16 +1,14 @@
-export const PIC_PATH = `./images/posters`;
 export const MAX_DESCRIPTION_LENGTH = 139;
-export const FILMS_QUANTITY = 12;
 export const CARDS_PER_PAGE = 5;
 export const MIN_SEARCH_LENGTH = 3;
 export const EMOJIS = [`smile`, `sleeping`, `puke`, `angry`];
 
-export const STATISTICS_FILTERS = [
-  {title: `All time`, value: `all-time`, isChecked: true},
-  {title: `Today`, value: `today`, isChecked: false},
-  {title: `Week`, value: `week`, isChecked: false},
-  {title: `Month`, value: `month`, isChecked: false},
-  {title: `Year`, value: `year`, isChecked: false},
+export const STATISTIC_FILTERS = [
+  {title: `All time`, value: `all-time`},
+  {title: `Today`, value: `today`},
+  {title: `Week`, value: `week`},
+  {title: `Month`, value: `month`},
+  {title: `Year`, value: `year`},
 ];
 
 export const RATINGS = [
@@ -40,12 +38,37 @@ export const PageElement = {
   BODY: document.querySelector(`body`),
   MAIN: document.querySelector(`.main`),
   HEADER: document.querySelector(`.header`),
-  // NAV: document.querySelector(`.main-navigation`),
-  // BOARD: document.querySelector(`.films`),
-  // MAIN_FILMS: document.querySelectorAll(`.films-list__container`)[0],
-  // TOP_RATED_FILMS: document.querySelectorAll(`.films-list__container`)[1],
-  // MOST_COMMENTED_FILMS: document.querySelectorAll(`.films-list__container`)[2],
-  SHOW_MORE: document.querySelector(`.films-list__show-more`),
   FOOTER_STATISTICS: document.querySelector(`.footer`),
+};
+
+export const Api = {
+  AUTHORIZATION: `Basic blablabla11`,
+  END_POINT: `https://htmlacademy-es-9.appspot.com/cinemaddict`,
+};
+
+export const StatisticBar = {
+  data: {
+    backgroundColor: `#ffe800`,
+    hoverBackgroundColor: `#ffe800`,
+    anchor: `start`,
+  },
+  options: {
+    datalabel: {
+      fontSize: 25,
+      color: `#ffffff`,
+      anchor: `start`,
+      align: `start`,
+      offset: 40,
+    },
+    animationEasing: `easeOutQuart`,
+    yAxes: {
+      barThickness: 30,
+      ticks: {
+        fontColor: `#ffffff`,
+        padding: 100,
+        fontSize: 25,
+      },
+    }
+  }
 };
 

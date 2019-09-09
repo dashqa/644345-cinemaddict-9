@@ -1,41 +1,34 @@
 import PageController from './controllers/page';
-import {generateFilmData} from './data/mock';
-import {PageElement, FILMS_QUANTITY} from './config';
+import {PageElement} from './config';
 
-
-const filmsData = [...Array(FILMS_QUANTITY)].map(generateFilmData);
 
 const state = {
-  films: JSON.parse(JSON.stringify(filmsData)),
-  userRating: 0,
-  watchlist: [],
-  watched: [],
-  favorites: [],
+  userRating: 10,
   get filters() {
     return [{
       title: `All movies`,
-      count: this.films.length,
+      count: 0,
       link: `all`,
       isCountable: true,
       isActive: true,
       isAdditional: false,
     }, {
       title: `Watchlist`,
-      count: this.watchlist.length,
+      count: 0,
       link: `watchlist`,
       isCountable: true,
       isActive: false,
       isAdditional: false,
     }, {
       title: `History`,
-      count: this.watched.length,
+      count: 0,
       link: `history`,
       isCountable: true,
       isActive: false,
       isAdditional: false,
     }, {
       title: `Favorites`,
-      count: this.favorites.length,
+      count: 0,
       link: `favorites`,
       isCountable: true,
       isActive: false,
@@ -49,17 +42,8 @@ const state = {
       isAdditional: true,
     }]
   },
-  get statistic() {
-    return [{
-      rank: `-`,
-      watchedQuantity: this.watched.length || 0,
-      watchedDuration: 0,
-      topGenre: `-`,
-    }]
-  },
 };
 
-const pageController = new PageController(PageElement.HEADER, PageElement.MAIN, state.films, state.filters, state.statistic, state.userRating);
+const pageController = new PageController(PageElement.HEADER, PageElement.MAIN, state.filters, state.userRating);
 pageController.init();
 
-export default state;

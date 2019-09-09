@@ -1,14 +1,16 @@
 import FilmController from './film';
 
 class FilmListController {
-  constructor(container, onDataChange) {
+  constructor(container, onDataChange, onCommentsChange) {
     this._container = container;
     this._onDataChangeMain = onDataChange;
+    this._onCommentsChangeMain = onCommentsChange;
     this._subscriptions = [];
     this._films = [];
 
-    this._onChangeView = this._onChangeView.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
+    this._onCommentsChange = this._onCommentsChange.bind(this);
+    this._onChangeView = this._onChangeView.bind(this);
   }
 
   setFilms(films) {
@@ -25,19 +27,20 @@ class FilmListController {
   }
 
   _renderFilm(film) {
-    const filmController = new FilmController(this._container, film, this._onChangeView, this._onDataChange);
+    const filmController = new FilmController(this._container, film, this._onChangeView, this._onDataChange, this._onCommentsChange);
     this._subscriptions.push(filmController.setDefaultView.bind(filmController));
+  }
+
+  _onDataChange(newFilmData) {
+    this._onDataChangeMain(newFilmData);
+  }
+
+  _onCommentsChange(commentActivity) {
+    this._onCommentsChangeMain(commentActivity);
   }
 
   _onChangeView() {
     this._subscriptions.forEach((subscription) => subscription());
-  }
-
-  _onDataChange(newFilmData, oldFilmData) {
-    this._films[this._films.indexOf(oldFilmData)] = newFilmData;
-
-    this.setFilms(this._films);
-    this._onDataChangeMain(this._films);
   }
 }
 

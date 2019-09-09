@@ -1,12 +1,11 @@
-import {PIC_PATH, FILM_CONTROLS, EMOJIS} from '../config';
-import {unrender} from '../utils';
+import {FILM_CONTROLS, EMOJIS} from '../config';
 import DefaultComponent from './default-component';
 import moment from 'moment';
 import 'moment-duration-format';
 
 class FilmCardDetails extends DefaultComponent {
-  constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genres,
-    description, picture, comments, inWatchlist, isWatched, isFavorite, userRating}) {
+  constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genre,
+    description, picture, inWatchlist, isWatched, isFavorite, userRating}, comments) {
     super();
     this._title = title;
     this._originalTitle = originalTitle;
@@ -18,7 +17,7 @@ class FilmCardDetails extends DefaultComponent {
     this._releaseDate = releaseDate;
     this._duration = duration;
     this._country = country;
-    this._genres = genres;
+    this._genre = genre;
     this._description = description;
     this._picture = picture;
     this._comments = comments;
@@ -27,11 +26,7 @@ class FilmCardDetails extends DefaultComponent {
     this._isFavorite = isFavorite;
     this._userRating = userRating;
 
-    this._onChangeWatchedStatus = this._onChangeWatchedStatus.bind(this);
-    this._onResetUserRating = this._onResetUserRating.bind(this);
-    this._onAddCommentEnterKey = this._onAddCommentEnterKey.bind(this);
     this._onChangeEmojiReaction = this._onChangeEmojiReaction.bind(this);
-    this._onCommentDelete = this._onCommentDelete.bind(this);
 
     this._subscribeOnEvents();
   }
@@ -60,7 +55,8 @@ class FilmCardDetails extends DefaultComponent {
       const value = i + 1;
       return `
       <input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${value}" 
-      id="rating-${value}">
+      id="rating-${value}"
+      ${parseInt(this._userRating, 10) === value ? `checked` : ``}>
       <label class="film-details__user-rating-label" for="rating-${value}">${value}</label>`.trim();
     }).join(` `);
   }
@@ -77,95 +73,17 @@ class FilmCardDetails extends DefaultComponent {
     return null;
   }
 
-  _onAddCommentEnterKey(evt) {
-    if (!(evt.key === `Enter` && (evt.ctrlKey || evt.metaKey))) {
-      return;
-    }
-    evt.preventDefault();
-    evt.stopPropagation();
-
-    const checkedEmoji = [...this._element.querySelectorAll(`input[name=comment-emoji]`)].filter((input) => input.checked)[0];
-
-    if (checkedEmoji) {
-      this._element.querySelector(`.film-details__comments-list`)
-        .insertAdjacentHTML(`beforeend`, `<li class="film-details__comment">
-          <span class="film-details__comment-emoji">
-            <img src="./images/emoji/${checkedEmoji.value}.png" width="55" height="55" alt="emoji">
-          </span>
-          <div>
-            <p class="film-details__comment-text">${evt.target.value}</p>
-            <p class="film-details__comment-info">
-              <span class="film-details__comment-author">автор</span>
-              <span class="film-details__comment-day">${this._humanizeTime(new Date())}</span>
-              <button class="film-details__comment-delete">Delete</button>
-            </p>
-          </div>
-        </li>`);
-
-      this._element.querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
-        button.addEventListener(`click`, this._onCommentDelete);
-      });
-    }
-
-    evt.target.value = ``;
-  }
-
-  _onCommentDelete(evt) {
-    evt.target.parentNode.parentNode.parentElement.remove();
-  }
-
   _onChangeEmojiReaction(evt) {
     evt.preventDefault();
     const reactionImage = this._element.querySelector(`.film-details__add-emoji-label`).firstElementChild;
-    reactionImage.src = `/images/emoji/${evt.target.value}.png`;
+    reactionImage.src = `./images/emoji/${evt.target.value}.png`;
   }
 
-  _onResetUserRating() {
-    const checkedInput = [...this._element.querySelectorAll(`input[name=score]`)].filter((input) => input.checked)[0];
-    if (checkedInput) {
-      checkedInput.checked = false;
-    }
-  }
-
-  _onChangeWatchedStatus() {
-    const filmDetailsMiddle = this._element.querySelector(`.form-details__middle-container`);
-
-    if (filmDetailsMiddle) {
-      unrender(filmDetailsMiddle);
-    }
-
-    this._element.querySelector(`.form-details__top-container`)
-      .insertAdjacentHTML(`afterend`, `<div class="form-details__middle-container">
-        <section class="film-details__user-rating-wrap">
-          <div class="film-details__user-rating-controls">
-            <button class="film-details__watched-reset" type="button">Undo</button>
-          </div>
-          <div class="film-details__user-score">
-            <div class="film-details__user-rating-poster">
-            <img src="${PIC_PATH}/${this._picture}" alt="film-poster" class="film-details__user-rating-img">
-           </div>
-           
-           <section class="film-details__user-rating-inner">
-            <h3 class="film-details__user-rating-title">${this._title}</h3>
-            <p class="film-details__user-rating-feelings">How you feel it?</p>
-            <div class="film-details__user-rating-score">
-             ${this._getRatingScoreTemplate()}
-            </div>
-           </section>
-          </div>
-         </section>
-       </div>`);
-    this._element.querySelector(`.film-details__watched-reset`).addEventListener(`click`, this._onResetUserRating);
-  }
 
   _subscribeOnEvents() {
-    this.getElement().querySelector(`#watched`).addEventListener(`change`, this._onChangeWatchedStatus);
-    this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`keydown`, this._onAddCommentEnterKey);
     this.getElement().querySelectorAll(`.film-details__emoji-item`)
       .forEach((input) => input.addEventListener(`change`, this._onChangeEmojiReaction));
-    this.getElement().querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
-      button.addEventListener(`click`, this._onCommentDelete);
-    });
+
   }
 
   getTemplate() {
@@ -178,7 +96,7 @@ class FilmCardDetails extends DefaultComponent {
           </div>
           <div class="film-details__info-wrap">
             <div class="film-details__poster">
-              <img class="film-details__poster-img" src="${PIC_PATH}/${this._picture}" alt="${this._title}">
+              <img class="film-details__poster-img" src="${this._picture}" alt="${this._title}">
               <p class="film-details__age">${this._minAge}+</p>
             </div>
     
@@ -222,7 +140,7 @@ class FilmCardDetails extends DefaultComponent {
                 <tr class="film-details__row">
                   <td class="film-details__term">Genres</td>
                   <td class="film-details__cell">
-                  ${Array.from(this._genres).map((genre) => `
+                  ${Array.from(this._genre).map((genre) => `
                     <span class="film-details__genre">${genre}</span>`.trim()).join(``)}
                   </td>
                 </tr>
@@ -246,7 +164,7 @@ class FilmCardDetails extends DefaultComponent {
           </section>
         </div>
         
-        ${this._isWatched && !this._userRating ? `
+        ${this._isWatched ? `
           <div class="form-details__middle-container" >
           <section class="film-details__user-rating-wrap">
             <div class="film-details__user-rating-controls">
@@ -254,7 +172,7 @@ class FilmCardDetails extends DefaultComponent {
             </div>
             <div class="film-details__user-score">
               <div class="film-details__user-rating-poster">
-              <img src="${PIC_PATH}/${this._picture}" alt="film-poster" class="film-details__user-rating-img">
+              <img src="${this._picture}" alt="film-poster" class="film-details__user-rating-img">
              </div>
              
              <section class="film-details__user-rating-inner">
@@ -274,17 +192,17 @@ class FilmCardDetails extends DefaultComponent {
             <span class="film-details__comments-count">${this._comments.length}</span></h3>
         
             <ul class="film-details__comments-list">
-            ${this._comments.map(({text, author, date, emotion}) => `
+            ${this._comments.map(({id, comment, author, date, emotion}) => `
               <li class="film-details__comment">
                 <span class="film-details__comment-emoji">
                   <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
                 </span>
                 <div>
-                  <p class="film-details__comment-text">${text}</p>
+                  <p class="film-details__comment-text">${comment}</p>
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${author}</span>
                     <span class="film-details__comment-day">${this._humanizeTime(date)}</span>
-                    <button class="film-details__comment-delete">Delete</button>
+                    <button data-id="${id}" class="film-details__comment-delete" >Delete</button>
                   </p>
                 </div>
               </li>`.trim()).join(``)}
@@ -292,7 +210,7 @@ class FilmCardDetails extends DefaultComponent {
         
             <div class="film-details__new-comment">
               <div for="add-emoji" class="film-details__add-emoji-label">
-                <img src="images/emoji/smile.png" width="55" height="55" alt="emoji">
+                <img src="./images/emoji/smile.png" width="55" height="55" alt="emoji">
               </div>
         
               <label class="film-details__comment-label">
