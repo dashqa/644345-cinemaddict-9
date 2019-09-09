@@ -1,6 +1,6 @@
 import {mostFrequents, findCounts, unrender, render} from '../utils';
 import Statistics from '../components/statistic';
-import {Position} from '../config';
+import {Position, StatisticBar} from '../config';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import moment from 'moment';
@@ -24,14 +24,9 @@ class StatisticController {
     this._onFilterClick = this._onFilterClick.bind(this);
   }
 
-  show(films, action = `set`) {
+  show(films, condition) {
     if (films !== this._films) {
-
-      if (action === `update`) {
-        this._updateData(films);
-      } else {
-        this._setData(films);
-      }
+      this._setData(films, condition);
       this._renderStatistic();
     }
 
@@ -42,20 +37,16 @@ class StatisticController {
     this._statistic.getElement().classList.add(`visually-hidden`);
   }
 
-  _setData(films) {
-    this._watchedFilms = films.filter((film) => film.isWatched);
-    this._watchedQuantity = this._watchedFilms.length;
-    this._watchedDuration = this._watchedFilms.reduce((sum, film) => sum + film.duration, 0);
+  _setData(films, condition = `new`) {
+    if (condition === `new`) {
+      this._watchedFilms = films.filter((film) => film.isWatched);
+      this._filteredFilms = this._watchedFilms;
+    } else {
+      this._filteredFilms = films;
+    }
 
-    this._allGenres = this._watchedFilms.map((film) => [...film.genre]).reduce((array, genre) => array.concat(genre));
-    this._topGenre = mostFrequents(this._allGenres)[0];
-  }
-
-  _updateData(films) {
-    this._filteredFilms = films;
     this._watchedQuantity = this._filteredFilms.length;
     this._watchedDuration = this._filteredFilms.reduce((sum, film) => sum + film.duration, 0);
-
     this._allGenres = this._filteredFilms.map((film) => [...film.genre]).reduce((array, genre) => array.concat(genre));
     this._topGenre = mostFrequents(this._allGenres)[0];
   }
@@ -120,32 +111,32 @@ class StatisticController {
       datasets: [
         {
           data,
-          backgroundColor: `#ffe800`,
-          hoverBackgroundColor: `#ffe800`,
-          anchor: `start`,
+          backgroundColor: StatisticBar.data.backgroundColor,
+          hoverBackgroundColor: StatisticBar.data.hoverBackgroundColor,
+          anchor: StatisticBar.data.anchor,
         },
       ],
     };
     const barOptions = {
       plugins: {
         datalabels: {
-          font: {size: 25},
-          color: `#fff`,
-          anchor: `start`,
-          align: `start`,
-          offset: 40,
+          font: {size: StatisticBar.options.datalabel.fontSize},
+          color: StatisticBar.options.datalabel.color,
+          anchor: StatisticBar.options.datalabel.anchor,
+          align: StatisticBar.options.datalabel.align,
+          offset: StatisticBar.options.datalabel.offset,
         },
       },
       animation: {
-        easing: `easeOutQuart`
+        easing: StatisticBar.options.animationEasing
       },
       scales: {
         yAxes: [{
-          barThickness: 30,
+          barThickness: StatisticBar.options.yAxes.barThickness,
           ticks: {
-            fontColor: `#fff`,
-            padding: 100,
-            fontSize: 25,
+            fontColor: StatisticBar.options.yAxes.ticks.fontColor,
+            padding: StatisticBar.options.yAxes.ticks.padding,
+            fontSize: StatisticBar.options.yAxes.ticks.fontSize,
           },
         }],
         xAxes: [{

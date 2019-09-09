@@ -8,7 +8,7 @@ import BoardController from '../controllers/board';
 import SearchController from '../controllers/search';
 import {API} from '../components/api/api';
 import {render} from '../utils';
-import {Position, Api} from '../config';
+import {Position, Api, PageElement} from '../config';
 
 class PageController {
   constructor(headerContainer, mainContainer, filters, userRating) {
@@ -43,7 +43,7 @@ class PageController {
       .then(() => this._renderHeader())
       .then(() => this._renderMain())
       .then(() => {
-        document.body.querySelector(`.footer__statistics`).firstElementChild
+        PageElement.FOOTER_STATISTICS.firstElementChild
           .innerHTML = (`${this._films.length} movies inside`);
       });
   }

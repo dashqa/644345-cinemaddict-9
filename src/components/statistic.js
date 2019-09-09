@@ -1,5 +1,5 @@
 import DefaultComponent from './default-component';
-import {STATISTICS_FILTERS, RATINGS} from '../config';
+import {STATISTIC_FILTERS, RATINGS} from '../config';
 import moment from 'moment';
 
 class Statistics extends DefaultComponent {
@@ -24,7 +24,7 @@ class Statistics extends DefaultComponent {
    
       <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
         <p class="statistic__filters-description">Show stats:</p>
-        ${STATISTICS_FILTERS.map((filter) => `
+        ${STATISTIC_FILTERS.map((filter) => `
           <input 
             type="radio" 
             class="statistic__filters-input visually-hidden" 
