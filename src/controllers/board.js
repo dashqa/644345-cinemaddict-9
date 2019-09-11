@@ -6,12 +6,12 @@ import FilmListController from '../controllers/film-list';
 import {CARDS_PER_PAGE, FILM_SECTIONS, Position} from '../config';
 import {render, unrender, findMostFilm, getSortedFilmsArray} from '../utils';
 
-
 class BoardController {
   constructor(container, onDataChange, onCommentsChange) {
     this._container = container;
     this._onDataChangeMain = onDataChange;
     this._onCommentsChangeMain = onCommentsChange;
+
     this._films = [];
     this._sorting = new Sorting();
     this._board = new Board();
@@ -68,6 +68,8 @@ class BoardController {
   }
 
   _renderBoard() {
+    this._unrenderShowMore();
+
     if (this._showedFilms < this._films.length) {
       this._renderShowMore();
     }
@@ -81,10 +83,7 @@ class BoardController {
     this._filmsMainController.addFilms(this._films.slice(this._showedFilms, this._showedFilms + CARDS_PER_PAGE));
     this._showedFilms += CARDS_PER_PAGE;
 
-    if (this._showedFilms >= this._films.length) {
-      unrender(this._showMore.getElement());
-      this._showMore.removeElement();
-    }
+    this._unrenderShowMore();
   }
 
   _renderShowMore() {
@@ -93,6 +92,13 @@ class BoardController {
 
     render(filmsList, showMoreElement, Position.BEFOREEND);
     showMoreElement.addEventListener(`click`, this._onClickMoreButton);
+  }
+
+  _unrenderShowMore() {
+    if (this._showedFilms >= this._films.length) {
+      unrender(this._showMore.getElement());
+      this._showMore.removeElement();
+    }
   }
 
   _onSortLinkClick(evt) {

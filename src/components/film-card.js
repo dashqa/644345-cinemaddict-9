@@ -41,7 +41,7 @@ class FilmCard extends DefaultComponent {
       <p class="film-card__info">
         <span class="film-card__year">${moment(this._releaseDate).format(`YYYY`)}</span>
         <span class="film-card__duration">${moment.duration(this._duration, `minutes`).format(`h[h] m[m]`)}</span>
-        <span class="film-details__genre">${this._genre.values().next().value || `Without genre`}</span>
+        <span class="film-details__genre">${this._genre.values().next().value || ``}</span>
       </p>
       <img src="${this._picture}" alt="${this._title}" class="film-card__poster">
       <p class="film-card__description">${truncateString(this._description, MAX_DESCRIPTION_LENGTH)}</p>

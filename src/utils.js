@@ -12,8 +12,20 @@ export const getSortedFilmsArray = (films, sortType) => {
   return null;
 };
 
-export const getSortingValue = (item, sortBy) => {
-  return sortBy === `rating`? item.rating : item.comments.length;
+export const getFilteredFilmsArray = (films, filterType) => {
+  switch (filterType) {
+    case `stats`:
+      return null;
+    case `watchlist`:
+      return films.filter((film) => film.inWatchlist);
+    case `history`:
+      return films.filter((film) => film.isWatched);
+    case `favorites`:
+      return films.filter((film) => film.isFavorite);
+    case `all`:
+      return films;
+  }
+  return null;
 };
 
 export const findCounts = (array) => {
@@ -35,6 +47,8 @@ export const mostFrequents = (array) => {
   return Object.keys(counts).filter(k => counts[k] === maxCount)
 };
 
+export const getSortingValue = (item, sortBy) => sortBy === `rating` ? item.rating : item.comments.length;
+
 export const findMostFilm = (array, findBy) => {
   const sorted = array.sort((a, b) => getSortingValue(b, findBy) - getSortingValue(a, findBy));
   const first = getSortingValue(sorted[0], findBy);
@@ -45,7 +59,6 @@ export const findMostFilm = (array, findBy) => {
   }
   return null;
 };
-
 
 export const createElement = (template) => {
   const element = document.createElement(`div`);
@@ -82,5 +95,16 @@ export const getRandomArray = (targetArray = [], size = 1) => {
     randomList.add(item);
   }
   return [...randomList];
+};
+
+export const debounce = (fn, time) => {
+  let timeout;
+
+  return function (...args) {
+    const functionCall = () => fn.apply(this, args);
+
+    clearTimeout(timeout);
+    timeout = setTimeout(functionCall, time);
+  }
 };
 
