@@ -3,18 +3,26 @@ export const CARDS_PER_PAGE = 5;
 export const MIN_SEARCH_LENGTH = 3;
 export const EMOJIS = [`smile`, `sleeping`, `puke`, `angry`];
 
-export const STATISTIC_FILTERS = [
-  {title: `All time`, value: `all-time`},
-  {title: `Today`, value: `today`},
-  {title: `Week`, value: `week`},
-  {title: `Month`, value: `month`},
-  {title: `Year`, value: `year`},
+export const FILTERS = [
+  {title: `All movies`, id: `all`, isCountable: false},
+  {title: `Watchlist`, id: `watchlist`, isCountable: true},
+  {title: `History`, id: `history`, isCountable: true},
+  {title: `Favorites`, id: `favorites`, isCountable: true},
+  {title: `Stats`, id: `stats`, isCountable: false}
 ];
 
 export const RATINGS = [
   {title: `Novice`, minRating: 1},
   {title: `Fan`, minRating: 10},
   {title: `Movie Buff`, minRating: 21}
+];
+
+export const STATISTIC_FILTERS = [
+  {title: `All time`, value: `all-time`},
+  {title: `Today`, value: `today`},
+  {title: `Week`, value: `week`},
+  {title: `Month`, value: `month`},
+  {title: `Year`, value: `year`},
 ];
 
 export const FILM_SECTIONS = [
@@ -38,7 +46,7 @@ export const PageElement = {
   BODY: document.querySelector(`body`),
   MAIN: document.querySelector(`.main`),
   HEADER: document.querySelector(`.header`),
-  FOOTER_STATISTICS: document.querySelector(`.footer`),
+  FOOTER_STATISTICS: document.querySelector(`.footer__statistics`),
 };
 
 export const Api = {
@@ -60,7 +68,7 @@ export const StatisticBar = {
       align: `start`,
       offset: 40,
     },
-    animationEasing: `easeOutQuart`,
+    animationEasing: `easeInOutQuad`,
     yAxes: {
       barThickness: 30,
       ticks: {

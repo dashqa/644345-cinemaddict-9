@@ -1,18 +1,16 @@
-import {mostFrequents, findCounts, unrender, render} from '../utils';
 import Statistics from '../components/statistic';
+import {mostFrequents, findCounts, getFilteredFilmsArray, unrender, render} from '../utils';
 import {Position, StatisticBar} from '../config';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import moment from 'moment';
 
 class StatisticController {
-  constructor(container, statistic, rank) {
-    this._rank = rank;
+  constructor(container) {
     this._container = container;
-    this._statistic = statistic;
+    this._statistic = null;
     this._currentFilter = `all-time`;
 
-    this._films = [];
     this._watchedFilms = [];
     this._filteredFilms = [];
     this._watchedQuantity = null;
@@ -24,22 +22,19 @@ class StatisticController {
     this._onFilterClick = this._onFilterClick.bind(this);
   }
 
-  show(films, condition) {
-    if (films !== this._films) {
-      this._setData(films, condition);
-      this._renderStatistic();
-    }
 
-    this._statistic.getElement().classList.remove(`visually-hidden`);
+  show(films, condition) {
+    this._setData(films, condition);
+    this._render();
   }
 
   hide() {
-    this._statistic.getElement().classList.add(`visually-hidden`);
+    this._unrender();
   }
 
   _setData(films, condition = `new`) {
     if (condition === `new`) {
-      this._watchedFilms = films.filter((film) => film.isWatched);
+      this._watchedFilms = getFilteredFilmsArray(films, `history`);
       this._filteredFilms = this._watchedFilms;
     } else {
       this._filteredFilms = films;
@@ -51,11 +46,11 @@ class StatisticController {
     this._topGenre = mostFrequents(this._allGenres)[0];
   }
 
-  _renderStatistic() {
-    this._unrenderStatistic();
+  _render() {
+    this._unrender();
 
     this._statistic = new Statistics({
-      rank: this._rank,
+      rank: this._watchedFilms.length,
       watchedQuantity: this._watchedQuantity,
       watchedDuration: this._watchedDuration,
       topGenre: this._topGenre,
@@ -69,7 +64,7 @@ class StatisticController {
       .forEach((input) => input.addEventListener(`click`, this._onFilterClick));
   }
 
-  _unrenderStatistic() {
+  _unrender() {
     if (this._statistic) {
       unrender(this._statistic.getElement());
       this._statistic.removeElement();
