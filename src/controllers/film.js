@@ -1,8 +1,7 @@
 import FilmCard from './../components/film-card';
 import FilmCardDetails from './../components/film-details';
-import {API} from '../components/api/api';
-import {render, unrender} from '../utils';
-import {Position, Api} from '../config';
+import {render, unrender, getDeepClassCopy} from '../utils';
+import {Position} from '../config';
 
 class FilmController {
   constructor(container, data, onChangeView, onDataChange, onCommentsChange) {
@@ -14,8 +13,6 @@ class FilmController {
     this._filmView = new FilmCard(data);
     this._currentFilm = this._filmView.getElement();
     this._filmDetails = {};
-
-    this._api = new API({endPoint: Api.END_POINT, authorization: Api.AUTHORIZATION});
 
     this._onClosePopupClick = this._onClosePopupClick.bind(this);
     this._onOpenPopupClick = this._onOpenPopupClick.bind(this);
@@ -51,7 +48,7 @@ class FilmController {
   }
 
   _initializeFilmDetails() {
-    this._api.getComments(this._data.id)
+    this._onCommentsChange({action: `get`, filmId: this._data.id})
       .then((comments) => {
         this._filmDetails = new FilmCardDetails(this._data, comments);
       })
@@ -108,12 +105,14 @@ class FilmController {
   }
 
   _onChangeUserRating(evt) {
-    this._onDataChange(Object.assign(this._data, {userRating: evt.target.value || 0}));
+    this._onDataChange(Object.assign(
+        getDeepClassCopy(this._data), {userRating: evt.target.value || 0}));
+
     this._setDetailsView();
   }
 
   _onCommentDelete(evt) {
-    this._onCommentsChange({action: `delete`, commentId: evt.target.dataset.id});
+    this._onCommentsChange({action: `delete`, filmId: this._data.id, commentId: evt.target.dataset.id});
     this._setDetailsView();
   }
 
@@ -145,7 +144,7 @@ class FilmController {
     const userRating = !this._data.isWatched ? 0 : this._data._userRating || 0;
     const watchedDate = this._data.isWatched ? null : new Date();
 
-    const getNewPropertysValue = () => {
+    const getNewPropertiesValue = () => {
       switch (evt.target.name) {
         case `watchlist`:
           return {inWatchlist: !this._data.inWatchlist};
@@ -156,7 +155,10 @@ class FilmController {
       }
       return null;
     };
-    this._onDataChange(Object.assign(this._data, getNewPropertysValue()));
+
+    this._onDataChange(Object.assign(
+        getDeepClassCopy(this._data), getNewPropertiesValue()));
+
     this._setDetailsView();
   }
 }

@@ -34,16 +34,17 @@ export const API = class {
       .then(ModelFilm.parseFilm);
   }
 
-  syncFilm({film}) {
+  syncFilms({films}) {
     return this._load({
       url: `movies/sync`,
       method: `POST`,
-      body: JSON.stringify(film),
+      body: JSON.stringify(films),
       headers: new Headers({'Content-Type': `application/json`})
     })
+      .then(toJSON);
   }
 
-  getComments(filmId) {
+  getComments({filmId}) {
     return this._load({url: `comments/${filmId}`})
       .then(toJSON)
   }

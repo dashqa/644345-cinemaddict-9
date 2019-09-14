@@ -1,6 +1,8 @@
 import {Position} from './config';
 import moment from 'moment';
 
+export const getDeepClassCopy = (instance) => Object.assign(Object.create(instance), instance);
+
 export const getSortedFilmsArray = (films, sortType) => {
   switch (sortType) {
     case `date`:

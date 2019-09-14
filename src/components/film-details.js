@@ -81,7 +81,7 @@ class FilmCardDetails extends DefaultComponent {
 
   _subscribeOnEvents() {
     this.getElement().querySelectorAll(`.film-details__emoji-item`)
-      .forEach((input) => input.addEventListener(`change`, this._onChangeEmojiReaction))
+      .forEach((input) => input.addEventListener(`change`, this._onChangeEmojiReaction));
   }
 
   shake() {
@@ -89,7 +89,7 @@ class FilmCardDetails extends DefaultComponent {
     textareaElement.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
 
     setTimeout(() => {
-      textareaElement.style.animation = ``
+      textareaElement.style.animation = ``;
     }, ANIMATION_TIMEOUT);
   }
 

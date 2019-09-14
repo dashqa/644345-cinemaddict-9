@@ -91,7 +91,7 @@ class BoardController {
   }
 
   _onCommentsChange(commentActivity) {
-    this._onCommentsChangeMain(commentActivity);
+    return this._onCommentsChangeMain(commentActivity);
   }
 
   _onClickMoreButton() {

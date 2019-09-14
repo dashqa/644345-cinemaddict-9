@@ -36,7 +36,7 @@ class FilmListController {
   }
 
   _onCommentsChange(commentActivity) {
-    this._onCommentsChangeMain(commentActivity);
+    return this._onCommentsChangeMain(commentActivity);
   }
 
   _onChangeView() {
