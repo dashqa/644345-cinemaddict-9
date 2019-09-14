@@ -1,8 +1,7 @@
 import FilmCard from './../components/film-card';
 import FilmCardDetails from './../components/film-details';
-import {API} from '../components/api/api';
-import {render, unrender} from '../utils';
-import {Position, Api} from '../config';
+import {render, unrender, getDeepClassCopy} from '../utils';
+import {Position} from '../config';
 
 class FilmController {
   constructor(container, data, onChangeView, onDataChange, onCommentsChange) {
@@ -14,8 +13,6 @@ class FilmController {
     this._filmView = new FilmCard(data);
     this._currentFilm = this._filmView.getElement();
     this._filmDetails = {};
-
-    this._api = new API({endPoint: Api.END_POINT, authorization: Api.AUTHORIZATION});
 
     this._onClosePopupClick = this._onClosePopupClick.bind(this);
     this._onOpenPopupClick = this._onOpenPopupClick.bind(this);
@@ -32,6 +29,13 @@ class FilmController {
     this._renderFilm();
   }
 
+  setDefaultView() {
+    if (document.body.contains(this._currentFilmDetails)) {
+      unrender(this._currentFilmDetails);
+      this._filmDetails.removeElement();
+    }
+  }
+
   _renderFilm() {
     this._currentFilm.querySelector(`.film-card__poster`).addEventListener(`click`, this._onOpenPopupClick);
     this._currentFilm.querySelector(`.film-card__title`).addEventListener(`click`, this._onOpenPopupClick);
@@ -43,16 +47,8 @@ class FilmController {
     render(this._container, this._currentFilm, Position.BEFOREEND);
   }
 
-  _onOpenPopupClick() {
-    this._initializeFilmDetails();
-  }
-
-  _onClosePopupClick() {
-    this.setDefaultView();
-  }
-
   _initializeFilmDetails() {
-    this._api.getComments(this._data.id)
+    this._onCommentsChange({action: `get`, filmId: this._data.id})
       .then((comments) => {
         this._filmDetails = new FilmCardDetails(this._data, comments);
       })
@@ -84,6 +80,23 @@ class FilmController {
     document.addEventListener(`keydown`, this._onEscKeyDown);
   }
 
+  _setDetailsView() {
+    if (document.body.contains(this._currentFilmDetails)) {
+      unrender(this._currentFilmDetails);
+      this._filmDetails.removeElement();
+
+      this._initializeFilmDetails();
+    }
+  }
+
+  _onOpenPopupClick() {
+    this._initializeFilmDetails();
+  }
+
+  _onClosePopupClick() {
+    this.setDefaultView();
+  }
+
   _onEscKeyDown(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       this._onClosePopupClick();
@@ -92,13 +105,15 @@ class FilmController {
   }
 
   _onChangeUserRating(evt) {
-    this._onDataChange(Object.assign(this._data, {userRating: evt.target.value || 0}));
-    this.setDetailsView();
+    this._onDataChange(Object.assign(
+        getDeepClassCopy(this._data), {userRating: evt.target.value || 0}));
+
+    this._setDetailsView();
   }
 
   _onCommentDelete(evt) {
-    this._onCommentsChange({action: `delete`, commentId: evt.target.dataset.id});
-    this.setDetailsView();
+    this._onCommentsChange({action: `delete`, filmId: this._data.id, commentId: evt.target.dataset.id});
+    this._setDetailsView();
   }
 
   _onAddCommentEnterKey(evt) {
@@ -121,7 +136,7 @@ class FilmController {
       filmId: this._data.id
     });
 
-    this.setDetailsView();
+    this._setDetailsView();
   }
 
   _onControlButtonClick(evt) {
@@ -129,7 +144,7 @@ class FilmController {
     const userRating = !this._data.isWatched ? 0 : this._data._userRating || 0;
     const watchedDate = this._data.isWatched ? null : new Date();
 
-    const getNewPropertysValue = () => {
+    const getNewPropertiesValue = () => {
       switch (evt.target.name) {
         case `watchlist`:
           return {inWatchlist: !this._data.inWatchlist};
@@ -140,26 +155,12 @@ class FilmController {
       }
       return null;
     };
-    this._onDataChange(Object.assign(this._data, getNewPropertysValue()));
-    this.setDetailsView();
+
+    this._onDataChange(Object.assign(
+        getDeepClassCopy(this._data), getNewPropertiesValue()));
+
+    this._setDetailsView();
   }
-
-  setDefaultView() {
-    if (document.body.contains(this._currentFilmDetails)) {
-      unrender(this._currentFilmDetails);
-      this._filmDetails.removeElement();
-    }
-  }
-
-  setDetailsView() {
-    if (document.body.contains(this._currentFilmDetails)) {
-      unrender(this._currentFilmDetails);
-      this._filmDetails.removeElement();
-
-      this._initializeFilmDetails();
-    }
-  }
-
 }
 
 export default FilmController;

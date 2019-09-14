@@ -1,4 +1,7 @@
 import {Position} from './config';
+import moment from 'moment';
+
+export const getDeepClassCopy = (instance) => Object.assign(Object.create(instance), instance);
 
 export const getSortedFilmsArray = (films, sortType) => {
   switch (sortType) {
@@ -24,6 +27,22 @@ export const getFilteredFilmsArray = (films, filterType) => {
       return films.filter((film) => film.isFavorite);
     case `all`:
       return films;
+  }
+  return null;
+};
+
+export const getWatchedFilmsByPeriod = (watchedFilms, period) => {
+  switch (period) {
+    case `all-time`:
+      return watchedFilms;
+    case `today`:
+      return watchedFilms.filter((film) => moment().isSame(moment(film.watchedDate), `day`));
+    case `week`:
+      return watchedFilms.filter((film) => moment(film.watchedDate) > moment().subtract(1, `w`));
+    case `month`:
+      return watchedFilms.filter((film) => moment(film.watchedDate) > moment().subtract(1, `months`));
+    case `year`:
+      return watchedFilms.filter((film) => moment(film.watchedDate) > moment().subtract(1, `y`));
   }
   return null;
 };
@@ -85,8 +104,10 @@ export const unrender = (element) => {
 
 export const truncateString = (string, length) => string.length > length ? string.substring(0, length) + '...' : string;
 
+export const objectToArray = (object) => Object.keys(object).map((id) => object[id]);
+
 export const getRandomItem = (targetArray = []) =>
-  targetArray[Math.floor(Math.random() * Math.floor(targetArray.length - 1))];
+  targetArray[Math.floor(Math.random() * Math.floor(targetArray.length))];
 
 export const getRandomArray = (targetArray = [], size = 1) => {
   const randomList = new Set();

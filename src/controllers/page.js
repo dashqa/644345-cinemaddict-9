@@ -1,3 +1,5 @@
+import Store from '../components/store';
+import Provider from '../components/api/provider';
 import Search from '../components/search/search';
 import NavController from '../controllers/nav';
 import StatisticController from '../controllers/statistic';
@@ -6,7 +8,7 @@ import SearchController from '../controllers/search';
 import ProfileController from '../controllers/profile';
 import {API} from '../components/api/api';
 import {render} from '../utils';
-import {Position, Api, PageElement} from '../config';
+import {Position, Api, PageElement, FILMS_STORE_KEY} from '../config';
 
 class PageController {
   constructor(headerContainer, mainContainer) {
@@ -14,7 +16,11 @@ class PageController {
     this._main = mainContainer;
 
     this._search = new Search();
-    this._api = new API({endPoint: Api.END_POINT, authorization: Api.AUTHORIZATION});
+    this._store = new Store({storage: window.localStorage, key: FILMS_STORE_KEY});
+    this._provider = new Provider({
+      api: new API({endPoint: Api.END_POINT, authorization: Api.AUTHORIZATION}),
+      store: this._store,
+    });
 
     this._films = [];
 
@@ -34,16 +40,27 @@ class PageController {
   }
 
   init() {
-    this._api.getFilms()
+    this._provider.getFilms()
       .then((films) => {
         this._films = films;
-      })
-      .then(() => this._renderHeader())
-      .then(() => this._renderMain())
-      .then(() => {
+
+        this._renderHeader();
+        this._renderMain();
         PageElement.FOOTER_STATISTICS.firstElementChild
           .innerHTML = (`${this._films.length} movies inside`);
       });
+
+    window.addEventListener(`offline`, this._onOfflineState);
+    window.addEventListener(`online`, this._onOnlineState);
+  }
+
+  _onOfflineState() {
+    document.title = `${document.title}[OFFLINE]`;
+  }
+
+  _onOnlineState() {
+    document.title = document.title.split(`[OFFLINE]`)[0];
+    this._provider.syncFilms();
   }
 
   _renderHeader() {
@@ -64,51 +81,6 @@ class PageController {
     return null;
   }
 
-  _onDataChange(newFilmData, isSearchOpen = false) {
-    this._api.updateFilm({
-      id: newFilmData.id,
-      data: newFilmData.toRAW(),
-    })
-      .then(() => this._api.getFilms())
-      .then((films) => {
-        this._films = films;
-      })
-      .then(() => {
-        this._profileController.show(this._films);
-        this._navController.show(this._films);
-        this._boardController.show(this._films);
-
-        if (isSearchOpen) {
-          this._showSearch();
-        }
-      });
-  }
-
-  _onCommentsChange({action, comment = null, filmId = null, commentId = null}) {
-    switch (action) {
-      case `create`:
-        this._api.createComment({
-          comment,
-          filmId,
-        })
-          .then(() => this._api.getFilms())
-          .then((films) => {
-            this._films = films;
-          })
-          .then(() => this._boardController.show(this._films));
-        break;
-      case `delete`:
-        this._api.deleteComment({
-          commentId
-        })
-          .then(() => this._api.getFilms())
-          .then((films) => {
-            this._films = films;
-          })
-          .then(() => this._boardController.show(this._films));
-    }
-  }
-
   _showSearch() {
     this._navController.hide();
     this._statisticController.hide();
@@ -124,6 +96,54 @@ class PageController {
   _showFilteredFilms(filteredFilms) {
     this._statisticController.hide();
     this._boardController.show(filteredFilms);
+  }
+
+  _onDataChange(newFilmData, isSearchOpen = false) {
+    this._provider.updateFilm({
+      id: newFilmData.id,
+      data: newFilmData.toRAW(),
+    })
+      .then(() => this._provider.getFilms())
+      .then((films) => {
+        this._films = films;
+
+        this._profileController.show(this._films);
+        this._navController.show(this._films);
+        this._boardController.show(this._films);
+
+        if (isSearchOpen) {
+          this._showSearch();
+        }
+      });
+  }
+
+  _onCommentsChange({action, comment = null, filmId = null, commentId = null}) {
+    switch (action) {
+      case `get`:
+        return this._provider.getComments({filmId});
+      case `create`:
+        this._provider.createComment({
+          comment,
+          filmId,
+        })
+          .then(() => this._provider.getFilms())
+          .then((films) => {
+            this._films = films;
+            this._boardController.show(this._films);
+          });
+        break;
+      case `delete`:
+        this._provider.deleteComment({
+          filmId,
+          commentId
+        })
+          .then(() => this._provider.getFilms())
+          .then((films) => {
+            this._films = films;
+            this._boardController.show(this._films);
+          });
+    }
+    return null;
   }
 
   _onInputClick(evt) {

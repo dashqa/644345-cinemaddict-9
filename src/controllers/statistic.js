@@ -1,9 +1,8 @@
 import Statistics from '../components/statistic';
-import {mostFrequents, findCounts, getFilteredFilmsArray, unrender, render} from '../utils';
+import {mostFrequents, findCounts, getFilteredFilmsArray, getWatchedFilmsByPeriod, unrender, render} from '../utils';
 import {Position, StatisticBar} from '../config';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import moment from 'moment';
 
 class StatisticController {
   constructor(container) {
@@ -24,7 +23,7 @@ class StatisticController {
 
 
   show(films, condition) {
-    this._setData(films, condition);
+    this._set(films, condition);
     this._render();
   }
 
@@ -32,10 +31,10 @@ class StatisticController {
     this._unrender();
   }
 
-  _setData(films, condition = `new`) {
+  _set(films, condition = `new`) {
     if (condition === `new`) {
       this._watchedFilms = getFilteredFilmsArray(films, `history`);
-      this._filteredFilms = this._watchedFilms;
+      this._filteredFilms = getWatchedFilmsByPeriod(this._watchedFilms, this._currentFilter);
     } else {
       this._filteredFilms = films;
     }
@@ -44,6 +43,11 @@ class StatisticController {
     this._watchedDuration = this._filteredFilms.reduce((sum, film) => sum + film.duration, 0);
     this._allGenres = this._filteredFilms.map((film) => [...film.genre]).reduce((array, genre) => array.concat(genre));
     this._topGenre = mostFrequents(this._allGenres)[0];
+  }
+
+  _initChart() {
+    const canvasElement = this._statistic.getElement().querySelector(`.statistic__chart`);
+    this._chart = new Chart(canvasElement, this._getChart());
   }
 
   _render() {
@@ -58,7 +62,7 @@ class StatisticController {
     });
 
     render(this._container, this._statistic.getElement(), Position.BEFOREEND);
-    this.initChart();
+    this._initChart();
 
     this._statistic.getElement().querySelectorAll(`.statistic__filters-input`)
       .forEach((input) => input.addEventListener(`click`, this._onFilterClick));
@@ -71,32 +75,6 @@ class StatisticController {
     }
   }
 
-  _onFilterClick(evt) {
-    const getFilteredFilms = () => {
-      switch (evt.target.value) {
-        case `all-time`:
-          return this._watchedFilms;
-        case `today`:
-          return this._watchedFilms.filter((film) => moment().isSame(moment(film.watchedDate), `day`));
-        case `week`:
-          return this._watchedFilms.filter((film) => moment(film.watchedDate) > moment().subtract(1, `w`));
-        case `month`:
-          return this._watchedFilms.filter((film) => moment(film.watchedDate) > moment().subtract(1, `months`));
-        case `year`:
-          return this._watchedFilms.filter((film) => moment(film.watchedDate) > moment().subtract(1, `y`));
-      }
-      return null;
-    };
-
-    this._currentFilter = evt.target.value;
-    this.show(getFilteredFilms(), `update`);
-  }
-
-  initChart() {
-    const canvas = this._statistic.getElement().querySelector(`.statistic__chart`);
-    this._chart = new Chart(canvas, this._getChart());
-  }
-
   _getChart() {
     const labels = Object.keys(findCounts(this._allGenres));
     const data = Object.values(findCounts(this._allGenres));
@@ -106,32 +84,32 @@ class StatisticController {
       datasets: [
         {
           data,
-          backgroundColor: StatisticBar.data.backgroundColor,
-          hoverBackgroundColor: StatisticBar.data.hoverBackgroundColor,
-          anchor: StatisticBar.data.anchor,
+          backgroundColor: StatisticBar.DATA.backgroundColor,
+          hoverBackgroundColor: StatisticBar.DATA.hoverBackgroundColor,
+          anchor: StatisticBar.DATA.anchor,
         },
       ],
     };
     const barOptions = {
       plugins: {
         datalabels: {
-          font: {size: StatisticBar.options.datalabel.fontSize},
-          color: StatisticBar.options.datalabel.color,
-          anchor: StatisticBar.options.datalabel.anchor,
-          align: StatisticBar.options.datalabel.align,
-          offset: StatisticBar.options.datalabel.offset,
+          font: {size: StatisticBar.OPTIONS.datalabel.fontSize},
+          color: StatisticBar.OPTIONS.datalabel.color,
+          anchor: StatisticBar.OPTIONS.datalabel.anchor,
+          align: StatisticBar.OPTIONS.datalabel.align,
+          offset: StatisticBar.OPTIONS.datalabel.offset,
         },
       },
       animation: {
-        easing: StatisticBar.options.animationEasing
+        easing: StatisticBar.OPTIONS.animationEasing
       },
       scales: {
         yAxes: [{
-          barThickness: StatisticBar.options.yAxes.barThickness,
+          barThickness: StatisticBar.OPTIONS.yAxes.barThickness,
           ticks: {
-            fontColor: StatisticBar.options.yAxes.ticks.fontColor,
-            padding: StatisticBar.options.yAxes.ticks.padding,
-            fontSize: StatisticBar.options.yAxes.ticks.fontSize,
+            fontColor: StatisticBar.OPTIONS.yAxes.ticks.fontColor,
+            padding: StatisticBar.OPTIONS.yAxes.ticks.padding,
+            fontSize: StatisticBar.OPTIONS.yAxes.ticks.fontSize,
           },
         }],
         xAxes: [{
@@ -151,6 +129,11 @@ class StatisticController {
       data: barData,
       options: barOptions,
     };
+  }
+
+  _onFilterClick(evt) {
+    this._currentFilter = evt.target.value;
+    this.show(getWatchedFilmsByPeriod(this._watchedFilms, evt.target.value), `update`);
   }
 }
 

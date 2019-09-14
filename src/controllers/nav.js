@@ -10,6 +10,7 @@ class NavController {
     this._showFilteredFilms = showFilteredFilms;
     this._nav = new NavMenu();
     this._films = [];
+    this._currentFilter = `all`;
     this._filtersController = null;
 
     this._onNavLinkClick = this._onNavLinkClick.bind(this);
@@ -30,7 +31,7 @@ class NavController {
     render(this._container, this._nav.getElement(), Position.AFTERBEGIN);
 
     this._filtersController = FILTERS.map((filter) => new FilterController(this._nav.getElement(), filter));
-    this._filtersController.forEach((filter) => filter.setFilter(this._films));
+    this._filtersController.forEach((filter) => filter.set(this._films));
 
     this._nav.getElement().querySelectorAll(`.main-navigation__item`)
       .forEach((link) => link.addEventListener(`click`, this._onNavLinkClick));
@@ -44,18 +45,20 @@ class NavController {
   }
 
   _onNavLinkClick(evt) {
-    const currentActive = this._nav.getElement().querySelector(`.main-navigation__item--active`);
-    if (evt.target === currentActive) {
+    const currentActiveElement = this._nav.getElement().querySelector(`.main-navigation__item--active`);
+    if (evt.target === currentActiveElement) {
       return;
     }
 
-    currentActive.classList.remove(`main-navigation__item--active`);
+    this._currentFilter = evt.target.hash.replace(`#`, ``);
+
+    currentActiveElement.classList.remove(`main-navigation__item--active`);
     evt.target.classList.add(`main-navigation__item--active`);
 
     if (evt.target.classList.contains(`main-navigation__item--additional`)) {
       this._showStatistic();
     } else {
-      this._showFilteredFilms(getFilteredFilmsArray(this._films, evt.target.hash.replace(`#`, ``)));
+      this._showFilteredFilms(getFilteredFilmsArray(this._films, this._currentFilter));
     }
   }
 }
