@@ -14,7 +14,7 @@ class FilterController {
     this._count = null;
   }
 
-  setFilter(films) {
+  set(films) {
     this._count = (getFilteredFilmsArray(films, this._id) || []).length;
     this._render();
   }

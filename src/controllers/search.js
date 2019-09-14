@@ -45,6 +45,12 @@ class SearchController {
     this._searchField.addEventListener(`keyup`, debounce(this._onInputKeyup, 400));
   }
 
+  _findSuitable(text) {
+    this._searchInput = text;
+    const films = this._films.filter((film) => film.title.toLowerCase().includes(text.toLowerCase()));
+    this._showSearchResult(text, films);
+  }
+
   _showSearchResult(text, films) {
     if (this._searchResultInfo) {
       unrender(this._searchResultInfo.getElement());
@@ -53,13 +59,7 @@ class SearchController {
 
     this._searchResultInfo = new SearchResultInfo({counter: films.length});
     render(this._container, this._searchResultInfo.getElement(), Position.AFTERBEGIN);
-    this._filmsListController.setFilms(films);
-  }
-
-  _findSuitable(text) {
-    this._searchInput = text;
-    const films = this._films.filter((film) => film.title.toLowerCase().includes(text.toLowerCase()));
-    this._showSearchResult(text, films);
+    this._filmsListController.set(films);
   }
 
   _unrender() {

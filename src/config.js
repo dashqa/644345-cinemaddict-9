@@ -1,6 +1,7 @@
 export const MAX_DESCRIPTION_LENGTH = 139;
 export const CARDS_PER_PAGE = 5;
 export const MIN_SEARCH_LENGTH = 3;
+export const ANIMATION_TIMEOUT = 600;
 export const EMOJIS = [`smile`, `sleeping`, `puke`, `angry`];
 
 export const FILTERS = [
@@ -55,12 +56,12 @@ export const Api = {
 };
 
 export const StatisticBar = {
-  data: {
+  DATA: {
     backgroundColor: `#ffe800`,
     hoverBackgroundColor: `#ffe800`,
     anchor: `start`,
   },
-  options: {
+  OPTIONS: {
     datalabel: {
       fontSize: 25,
       color: `#ffffff`,

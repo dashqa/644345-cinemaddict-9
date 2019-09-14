@@ -1,35 +1,35 @@
 import moment from 'moment';
 
 class ModelFilm {
-  constructor(data) {
-    this.id = data[`id`] || null;
-    this.picture = `./${data[`film_info`][`poster`]}` || ``;
-    this.title = data[`film_info`][`title`] || ``;
-    this.originalTitle = data[`film_info`][`alternative_title`] || ``;
-    this.description = data[`film_info`][`description`] || ``;
-    this.duration = data[`film_info`][`runtime`] || null;
-    this.rating = data[`film_info`][`total_rating`] || 0;
-    this.releaseDate = data[`film_info`][`release`][`date`] || null;
-    this.country = data[`film_info`][`release`][`release_country`] || ``;
-    this.genre = new Set(data[`film_info`][`genre`] || []);
-    this.minAge = data[`film_info`][`age_rating`] || 0;
-    this.actors = data[`film_info`][`actors`] || [];
-    this.director = data[`film_info`][`director`] || ``;
-    this.writers = data[`film_info`][`writers`] || [];
-    this.comments = data[`comments`];
-    this.inWatchlist = Boolean(data[`user_details`][`watchlist`]) || false;
-    this.isWatched = Boolean(data[`user_details`][`already_watched`]) || false;
-    this.isFavorite = Boolean(data[`user_details`][`favorite`]) || false;
-    this.userRating = data[`user_details`][`personal_rating`] || ``;
-    this.watchedDate = moment(data[`user_details`][`watching_date`]).format() || null;
+  constructor(filmData) {
+    this.id = filmData[`id`] || null;
+    this.picture = `./${filmData[`film_info`][`poster`]}` || ``;
+    this.title = filmData[`film_info`][`title`] || ``;
+    this.originalTitle = filmData[`film_info`][`alternative_title`] || ``;
+    this.description = filmData[`film_info`][`description`] || ``;
+    this.duration = filmData[`film_info`][`runtime`] || null;
+    this.rating = filmData[`film_info`][`total_rating`] || 0;
+    this.releaseDate = filmData[`film_info`][`release`][`date`] || null;
+    this.country = filmData[`film_info`][`release`][`release_country`] || ``;
+    this.genre = new Set(filmData[`film_info`][`genre`] || []);
+    this.minAge = filmData[`film_info`][`age_rating`] || 0;
+    this.actors = filmData[`film_info`][`actors`] || [];
+    this.director = filmData[`film_info`][`director`] || ``;
+    this.writers = filmData[`film_info`][`writers`] || [];
+    this.comments = filmData[`comments`];
+    this.inWatchlist = Boolean(filmData[`user_details`][`watchlist`]) || false;
+    this.isWatched = Boolean(filmData[`user_details`][`already_watched`]) || false;
+    this.isFavorite = Boolean(filmData[`user_details`][`favorite`]) || false;
+    this.userRating = filmData[`user_details`][`personal_rating`] || ``;
+    this.watchedDate = moment(filmData[`user_details`][`watching_date`]).format() || null;
   }
 
-  static parseFilm(data) {
-    return new ModelFilm(data);
+  static parseFilm(filmData) {
+    return new ModelFilm(filmData);
   }
 
-  static parseFilms(data) {
-    return data.map(ModelFilm.parseFilm);
+  static parseFilms(filmData) {
+    return filmData.map(ModelFilm.parseFilm);
   }
 
   toRAW() {

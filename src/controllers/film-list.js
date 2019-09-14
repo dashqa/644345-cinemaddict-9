@@ -13,20 +13,20 @@ class FilmListController {
     this._onChangeView = this._onChangeView.bind(this);
   }
 
-  setFilms(films) {
+  set(films) {
     this._films = films;
     this._subscriptions = [];
 
     this._container.innerHTML = ``;
-    this._films.forEach((film) => this._renderFilm(film));
+    this._films.forEach((film) => this._render(film));
   }
 
-  addFilms(films) {
-    films.forEach((film) => this._renderFilm(film));
+  add(films) {
+    films.forEach((film) => this._render(film));
     this._films = [...this._films, ...films];
   }
 
-  _renderFilm(film) {
+  _render(film) {
     const filmController = new FilmController(this._container, film, this._onChangeView, this._onDataChange, this._onCommentsChange);
     this._subscriptions.push(filmController.setDefaultView.bind(filmController));
   }

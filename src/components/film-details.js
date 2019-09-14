@@ -1,4 +1,4 @@
-import {FILM_CONTROLS, EMOJIS} from '../config';
+import {FILM_CONTROLS, EMOJIS, ANIMATION_TIMEOUT} from '../config';
 import DefaultComponent from './default-component';
 import moment from 'moment';
 import 'moment-duration-format';
@@ -75,15 +75,22 @@ class FilmCardDetails extends DefaultComponent {
 
   _onChangeEmojiReaction(evt) {
     evt.preventDefault();
-    const reactionImage = this._element.querySelector(`.film-details__add-emoji-label`).firstElementChild;
-    reactionImage.src = `./images/emoji/${evt.target.value}.png`;
+    const reactionImageElement = this._element.querySelector(`.film-details__add-emoji-label`).firstElementChild;
+    reactionImageElement.src = `./images/emoji/${evt.target.value}.png`;
   }
-
 
   _subscribeOnEvents() {
     this.getElement().querySelectorAll(`.film-details__emoji-item`)
-      .forEach((input) => input.addEventListener(`change`, this._onChangeEmojiReaction));
+      .forEach((input) => input.addEventListener(`change`, this._onChangeEmojiReaction))
+  }
 
+  shake() {
+    const textareaElement = this.getElement().querySelector(`.film-details__comment-label`);
+    textareaElement.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      textareaElement.style.animation = ``
+    }, ANIMATION_TIMEOUT);
   }
 
   getTemplate() {

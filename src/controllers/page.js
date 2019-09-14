@@ -1,3 +1,4 @@
+import Provider from '../components/api/provider';
 import Search from '../components/search/search';
 import NavController from '../controllers/nav';
 import StatisticController from '../controllers/statistic';
@@ -14,7 +15,7 @@ class PageController {
     this._main = mainContainer;
 
     this._search = new Search();
-    this._api = new API({endPoint: Api.END_POINT, authorization: Api.AUTHORIZATION});
+    this._provider = new Provider(new API({endPoint: Api.END_POINT, authorization: Api.AUTHORIZATION}));
 
     this._films = [];
 
@@ -64,6 +65,23 @@ class PageController {
     return null;
   }
 
+  _showSearch() {
+    this._navController.hide();
+    this._statisticController.hide();
+    this._boardController.hide();
+    this._searchController.show(this._films);
+  }
+
+  _showStatistic() {
+    this._boardController.hide();
+    this._statisticController.show(this._films);
+  }
+
+  _showFilteredFilms(filteredFilms) {
+    this._statisticController.hide();
+    this._boardController.show(filteredFilms);
+  }
+
   _onDataChange(newFilmData, isSearchOpen = false) {
     this._api.updateFilm({
       id: newFilmData.id,
@@ -107,23 +125,6 @@ class PageController {
           })
           .then(() => this._boardController.show(this._films));
     }
-  }
-
-  _showSearch() {
-    this._navController.hide();
-    this._statisticController.hide();
-    this._boardController.hide();
-    this._searchController.show(this._films);
-  }
-
-  _showStatistic() {
-    this._boardController.hide();
-    this._statisticController.show(this._films);
-  }
-
-  _showFilteredFilms(filteredFilms) {
-    this._statisticController.hide();
-    this._boardController.show(filteredFilms);
   }
 
   _onInputClick(evt) {
