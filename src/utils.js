@@ -49,11 +49,11 @@ export const findCounts = (array) => {
   const counts = array.reduce((accum, current) => {
     accum[current] = (accum[current] || 0) + 1;
     return accum;
-  },{});
+  }, {});
 
   // сортируем в порядке убывания значения ключа
   return Object.keys(counts)
-    .sort((a,b) => counts[b] - counts[a])
+    .sort((a, b) => counts[b] - counts[a])
     .reduce((obj, key) => (Object.assign({}, obj, {[key]: counts[key]})), {});
 };
 
@@ -61,7 +61,7 @@ export const mostFrequents = (array) => {
   const counts = findCounts(array);
   const maxCount = Math.max(...Object.values(counts));
 
-  return Object.keys(counts).filter(k => counts[k] === maxCount)
+  return Object.keys(counts).filter((k) => counts[k] === maxCount);
 };
 
 export const getSortingValue = (item, sortBy) => sortBy === `rating` ? item.rating : item.comments.length;
@@ -69,7 +69,7 @@ export const getSortingValue = (item, sortBy) => sortBy === `rating` ? item.rati
 export const findMostFilm = (array, findBy) => {
   const sorted = array.sort((a, b) => getSortingValue(b, findBy) - getSortingValue(a, findBy));
   const first = getSortingValue(sorted[0], findBy);
-  const last = getSortingValue(sorted[sorted.length - 1],findBy);
+  const last = getSortingValue(sorted[sorted.length - 1], findBy);
 
   if (first && last !== 0) {
     return first === last ? getRandomArray(sorted, 2) : sorted.slice(0, 2);
@@ -100,7 +100,7 @@ export const unrender = (element) => {
   }
 };
 
-export const truncateString = (string, length) => string.length > length ? string.substring(0, length) + '...' : string;
+export const truncateString = (string, length) => string.length > length ? string.substring(0, length) + `...` : string;
 
 export const objectToArray = (object) => Object.keys(object).map((id) => object[id]);
 
@@ -124,6 +124,6 @@ export const debounce = (fn, time) => {
 
     clearTimeout(timeout);
     timeout = setTimeout(functionCall, time);
-  }
+  };
 };
 
