@@ -118,9 +118,9 @@ export const getRandomArray = (targetArray = [], size = 1) => {
 
 export const debounce = (fn, time) => {
   let timeout;
+  const self = this;
 
   return function (...args) {
-    const self = this;
     const functionCall = () => fn.apply(self, args);
 
     clearTimeout(timeout);
