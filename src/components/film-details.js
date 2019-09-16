@@ -5,7 +5,7 @@ import 'moment-duration-format';
 
 class FilmCardDetails extends DefaultComponent {
   constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genre,
-    description, picture, inWatchlist, isWatched, isFavorite, userRating}, comments) {
+    description, picture, inWatchlist, isWatched, isFavorite, userRating}, comments, internetConnection) {
     super();
     this._title = title;
     this._originalTitle = originalTitle;
@@ -25,6 +25,7 @@ class FilmCardDetails extends DefaultComponent {
     this._isWatched = isWatched;
     this._isFavorite = isFavorite;
     this._userRating = userRating;
+    this._internetConnection = internetConnection;
 
     this._onChangeEmojiReaction = this._onChangeEmojiReaction.bind(this);
 
@@ -193,6 +194,7 @@ class FilmCardDetails extends DefaultComponent {
            </section>
          </div>`.trim() : ``}
         
+        ${this._internetConnection ? `
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments 
@@ -239,7 +241,7 @@ class FilmCardDetails extends DefaultComponent {
               </div>
             </div>
            </section>
-        </div>
+        </div>`.trim() : ``}
       </form>
     </section>
     `.trim();

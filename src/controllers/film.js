@@ -1,6 +1,6 @@
 import FilmCard from './../components/film-card';
 import FilmCardDetails from './../components/film-details';
-import {render, unrender, getDeepClassCopy} from '../utils';
+import {render, unrender} from '../utils';
 import {Position} from '../config';
 
 class FilmController {
@@ -36,6 +36,15 @@ class FilmController {
     }
   }
 
+  _setDetailsView() {
+    if (document.body.contains(this._currentFilmDetails)) {
+      unrender(this._currentFilmDetails);
+      this._filmDetails.removeElement();
+
+      this._initializeFilmDetails();
+    }
+  }
+
   _renderFilm() {
     this._currentFilm.querySelector(`.film-card__poster`).addEventListener(`click`, this._onOpenPopupClick);
     this._currentFilm.querySelector(`.film-card__title`).addEventListener(`click`, this._onOpenPopupClick);
@@ -50,24 +59,24 @@ class FilmController {
   _initializeFilmDetails() {
     this._onCommentsChange({action: `get`, filmId: this._data.id})
       .then((comments) => {
-        this._filmDetails = new FilmCardDetails(this._data, comments);
+        this._filmDetails = new FilmCardDetails(this._data, comments, this._isOnline());
+        this._renderFilmDetails();
       })
-      .then(() => this._renderFilmDetails());
   }
 
   _renderFilmDetails() {
     this._currentFilmDetails = this._filmDetails.getElement();
 
-    const textareaElement = this._currentFilmDetails.querySelector(`.film-details__comment-input`);
-    textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, this._onEscKeyDown));
-    textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, this._onEscKeyDown));
-    this._currentFilmDetails.querySelector(`.film-details__close-btn`).addEventListener(`click`, this._onClosePopupClick);
-    this._currentFilmDetails.querySelectorAll(`.film-details__controls`).forEach((input) =>
-      input.addEventListener(`change`, this._onControlButtonClick));
-    this._currentFilmDetails.querySelector(`.film-details__comment-input`).addEventListener(`keydown`, this._onAddCommentEnterKey);
-    this._currentFilmDetails.querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
-      button.addEventListener(`click`, this._onCommentDelete);
-    });
+    if (this._isOnline()) {
+      const textareaElement = this._currentFilmDetails.querySelector(`.film-details__comment-input`);
+      textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, this._onEscKeyDown));
+      textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, this._onEscKeyDown));
+
+      this._currentFilmDetails.querySelector(`.film-details__comment-input`).addEventListener(`keydown`, this._onAddCommentEnterKey);
+      this._currentFilmDetails.querySelectorAll(`.film-details__comment-delete`).forEach((button) => {
+        button.addEventListener(`click`, this._onCommentDelete);
+      });
+    }
 
     if (this._data.isWatched) {
       this._currentFilmDetails.querySelectorAll(`.film-details__user-rating-input`).forEach((input) =>
@@ -75,18 +84,13 @@ class FilmController {
       this._currentFilmDetails.querySelector(`.film-details__watched-reset`).addEventListener(`click`, this._onChangeUserRating);
     }
 
+    this._currentFilmDetails.querySelector(`.film-details__close-btn`).addEventListener(`click`, this._onClosePopupClick);
+    this._currentFilmDetails.querySelectorAll(`.film-details__controls`).forEach((input) =>
+      input.addEventListener(`change`, this._onControlButtonClick));
+
     this._onChangeView();
     render(document.body, this._currentFilmDetails, Position.BEFOREEND);
     document.addEventListener(`keydown`, this._onEscKeyDown);
-  }
-
-  _setDetailsView() {
-    if (document.body.contains(this._currentFilmDetails)) {
-      unrender(this._currentFilmDetails);
-      this._filmDetails.removeElement();
-
-      this._initializeFilmDetails();
-    }
   }
 
   _onOpenPopupClick() {
@@ -105,9 +109,7 @@ class FilmController {
   }
 
   _onChangeUserRating(evt) {
-    this._onDataChange(Object.assign(
-        getDeepClassCopy(this._data), {userRating: evt.target.value || 0}));
-
+    this._onDataChange(Object.assign(this._data, {userRating: evt.target.value || 0}));
     this._setDetailsView();
   }
 
@@ -135,7 +137,6 @@ class FilmController {
       },
       filmId: this._data.id
     });
-
     this._setDetailsView();
   }
 
@@ -156,10 +157,12 @@ class FilmController {
       return null;
     };
 
-    this._onDataChange(Object.assign(
-        getDeepClassCopy(this._data), getNewPropertiesValue()));
-
+    this._onDataChange(Object.assign(this._data, getNewPropertiesValue()));
     this._setDetailsView();
+  }
+
+  _isOnline() {
+    return window.navigator.onLine;
   }
 }
 

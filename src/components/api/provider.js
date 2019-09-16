@@ -39,12 +39,15 @@ const Provider = class {
     if (this._isOnline()) {
       return this._api.getComments({filmId})
         .then((comments) => {
+
           const rawFilms = objectToArray(this._store.getAll());
           const filmDataWithComments = Object.assign({}, rawFilms[filmId], {comments});
 
           this._store.setItem({key: filmId, item: filmDataWithComments});
           return comments;
         });
+    } else {
+      return Promise.resolve(null);
     }
   }
 
@@ -59,6 +62,8 @@ const Provider = class {
           this._store.setItem({key: filmId, item: filmDataWithComments});
           return comments;
         });
+    } else {
+      return Promise.resolve(null);
     }
   }
 
@@ -73,6 +78,8 @@ const Provider = class {
 
           this._store.setItem({key: filmId, item: filmDataWithComments});
         });
+    } else {
+      return Promise.resolve(null);
     }
   }
 

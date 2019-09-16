@@ -1,4 +1,4 @@
-import Store from '../components/store';
+import Store from '../store';
 import Provider from '../components/api/provider';
 import Search from '../components/search/search';
 import NavController from '../controllers/nav';
@@ -54,15 +54,6 @@ class PageController {
     window.addEventListener(`online`, this._onOnlineState);
   }
 
-  _onOfflineState() {
-    document.title = `${document.title}[OFFLINE]`;
-  }
-
-  _onOnlineState() {
-    document.title = document.title.split(`[OFFLINE]`)[0];
-    this._provider.syncFilms();
-  }
-
   _renderHeader() {
     render(this._header, this._search.getElement(), Position.BEFOREEND);
     this._profileController.show(this._films);
@@ -96,6 +87,15 @@ class PageController {
   _showFilteredFilms(filteredFilms) {
     this._statisticController.hide();
     this._boardController.show(filteredFilms);
+  }
+
+  _onOfflineState() {
+    document.title = `${document.title}[OFFLINE]`;
+  }
+
+  _onOnlineState() {
+    document.title = document.title.split(`[OFFLINE]`)[0];
+    this._provider.syncFilms();
   }
 
   _onDataChange(newFilmData, isSearchOpen = false) {
