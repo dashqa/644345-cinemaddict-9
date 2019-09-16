@@ -29,18 +29,13 @@ class FilmController {
     this._renderFilm();
   }
 
-  setDefaultView() {
+  setView(view = `default`) {
     if (document.body.contains(this._currentFilmDetails)) {
       unrender(this._currentFilmDetails);
       this._filmDetails.removeElement();
     }
-  }
 
-  _setDetailsView() {
-    if (document.body.contains(this._currentFilmDetails)) {
-      unrender(this._currentFilmDetails);
-      this._filmDetails.removeElement();
-
+    if (view === `details`) {
       this._initializeFilmDetails();
     }
   }
@@ -61,7 +56,7 @@ class FilmController {
       .then((comments) => {
         this._filmDetails = new FilmCardDetails(this._data, comments, this._isOnline());
         this._renderFilmDetails();
-      })
+      });
   }
 
   _renderFilmDetails() {
@@ -94,11 +89,11 @@ class FilmController {
   }
 
   _onOpenPopupClick() {
-    this._initializeFilmDetails();
+    this.setView(`details`);
   }
 
   _onClosePopupClick() {
-    this.setDefaultView();
+    this.setView(`default`);
   }
 
   _onEscKeyDown(evt) {
@@ -110,12 +105,12 @@ class FilmController {
 
   _onChangeUserRating(evt) {
     this._onDataChange(Object.assign(this._data, {userRating: evt.target.value || 0}));
-    this._setDetailsView();
+    this.setView(`details`);
   }
 
   _onCommentDelete(evt) {
     this._onCommentsChange({action: `delete`, filmId: this._data.id, commentId: evt.target.dataset.id});
-    this._setDetailsView();
+    this.setView(`details`);
   }
 
   _onAddCommentEnterKey(evt) {
@@ -137,7 +132,7 @@ class FilmController {
       },
       filmId: this._data.id
     });
-    this._setDetailsView();
+    this.setView(`details`);
   }
 
   _onControlButtonClick(evt) {
@@ -158,7 +153,10 @@ class FilmController {
     };
 
     this._onDataChange(Object.assign(this._data, getNewPropertiesValue()));
-    this._setDetailsView();
+
+    if (evt.target.tagName === `INPUT`) {
+      this.setView(`details`);
+    }
   }
 
   _isOnline() {

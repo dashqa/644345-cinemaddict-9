@@ -28,7 +28,7 @@ class FilmListController {
 
   _render(film) {
     const filmController = new FilmController(this._container, film, this._onChangeView, this._onDataChange, this._onCommentsChange);
-    this._subscriptions.push(filmController.setDefaultView.bind(filmController));
+    this._subscriptions.push(filmController.setView.bind(filmController));
   }
 
   _onDataChange(newFilmData) {
