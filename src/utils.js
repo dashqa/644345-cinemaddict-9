@@ -116,15 +116,11 @@ export const getRandomArray = (targetArray = [], size = 1) => {
   return [...randomList];
 };
 
-export const debounce = (fn, time) => {
-  let timeout;
-  const self = this;
-
-  return function (...args) {
-    const functionCall = () => fn.apply(self, args);
-
-    clearTimeout(timeout);
-    timeout = setTimeout(functionCall, time);
+export const debounce = (callback, time = 400, interval) =>
+  (...args) => {
+    clearTimeout(interval);
+    interval = setTimeout(() => {
+      callback(...args);
+    }, time);
   };
-};
 
