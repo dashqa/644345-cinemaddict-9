@@ -120,7 +120,8 @@ export const debounce = (fn, time) => {
   let timeout;
 
   return function (...args) {
-    const functionCall = () => fn.apply(this, args);
+    let self = this;
+    const functionCall = () => fn.apply(self, args);
 
     clearTimeout(timeout);
     timeout = setTimeout(functionCall, time);
