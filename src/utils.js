@@ -54,7 +54,7 @@ export const findCounts = (array) => {
   // сортируем в порядке убывания значения ключа
   return Object.keys(counts)
     .sort((a,b) => counts[b] - counts[a])
-    .reduce((obj, key) => ({...obj, [key]: counts[key]}), {});
+    .reduce((obj, key) => (Object.assign({}, obj, {[key]: counts[key]})), {});
 };
 
 export const mostFrequents = (array) => {

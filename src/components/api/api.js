@@ -46,7 +46,7 @@ export const API = class {
 
   getComments({filmId}) {
     return this._load({url: `comments/${filmId}`})
-      .then(toJSON)
+      .then(toJSON);
   }
 
   createComment({comment, filmId}) {
@@ -56,7 +56,7 @@ export const API = class {
       body: JSON.stringify(comment),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON)
+      .then(toJSON);
   }
 
   deleteComment({commentId}) {

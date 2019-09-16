@@ -73,7 +73,7 @@ const Provider = class {
         .then(() => {
           const rawFilms = objectToArray(this._store.getAll());
           const index = rawFilms[filmId].comments.findIndex((comment) => comment.id === commentId);
-          const commentsWithoutDeleted = rawFilms[filmId].comments.splice(rawFilms[filmId].comments[index],1);
+          const commentsWithoutDeleted = rawFilms[filmId].comments.splice(rawFilms[filmId].comments[index], 1);
           const filmDataWithComments = Object.assign({}, rawFilms[filmId], {comments: commentsWithoutDeleted});
 
           this._store.setItem({key: filmId, item: filmDataWithComments});

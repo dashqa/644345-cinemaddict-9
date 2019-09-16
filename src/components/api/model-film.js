@@ -59,7 +59,7 @@ class ModelFilm {
         'watching_date': new Date(this.watchedDate) || null,
       },
       'comments': this.comments,
-    }
+    };
   }
 }
 
