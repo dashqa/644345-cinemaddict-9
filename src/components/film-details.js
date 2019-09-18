@@ -85,15 +85,6 @@ class FilmCardDetails extends DefaultComponent {
       .forEach((input) => input.addEventListener(`change`, this._onChangeEmojiReaction));
   }
 
-  shake() {
-    const textareaElement = this.getElement().querySelector(`.film-details__comment-label`);
-    textareaElement.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      textareaElement.style.animation = ``;
-    }, ANIMATION_TIMEOUT);
-  }
-
   getTemplate() {
     return `
     <section class="film-details">
