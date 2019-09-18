@@ -1,4 +1,4 @@
-import {FILM_CONTROLS, EMOJIS, ANIMATION_TIMEOUT} from '../config';
+import {FILM_CONTROLS, EMOJIS} from '../config';
 import DefaultComponent from './default-component';
 import moment from 'moment';
 import 'moment-duration-format';

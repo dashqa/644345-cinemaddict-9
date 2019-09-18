@@ -1,7 +1,6 @@
 export const MAX_DESCRIPTION_LENGTH = 139;
 export const CARDS_PER_PAGE = 5;
 export const MIN_SEARCH_LENGTH = 3;
-export const ANIMATION_TIMEOUT = 600;
 export const EMOJIS = [`smile`, `sleeping`, `puke`, `angry`];
 export const FILMS_STORE_KEY = `films-store-key`;
 
