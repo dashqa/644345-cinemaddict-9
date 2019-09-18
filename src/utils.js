@@ -109,7 +109,7 @@ export const getRandomItem = (targetArray = []) =>
 
 export const getRandomArray = (targetArray = [], size = 1) => {
   const randomList = new Set();
-  while (randomList.size <= size - 1) {
+  for (let i = 0; i <= size; i++) {
     const item = getRandomItem(targetArray);
     randomList.add(item);
   }
