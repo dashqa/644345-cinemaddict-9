@@ -47,7 +47,7 @@ class PageController {
         this._renderHeader();
         this._renderMain();
         PageElement.FOOTER_STATISTICS.firstElementChild
-          .innerHTML = (`${this._films.length} movies inside`);
+          .innerText = `${this._films.length} movies inside`;
       });
 
     window.addEventListener(`offline`, this._onOfflineState);

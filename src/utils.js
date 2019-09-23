@@ -1,5 +1,12 @@
 import {Position} from './config';
 import moment from 'moment';
+import DOMPurify from 'dompurify';
+
+
+export const sanitizeInput = (input) => {
+  const config = { ALLOWED_TAGS: ['#text'], KEEP_CONTENT: true};
+  return DOMPurify.sanitize(input, config);
+};
 
 export const getSortedFilmsArray = (films, sortType) => {
   switch (sortType) {

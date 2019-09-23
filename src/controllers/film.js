@@ -114,9 +114,10 @@ class FilmController {
   }
 
   _onAddCommentEnterKey(evt) {
-    if (!(evt.key === `Enter` && (evt.ctrlKey || evt.metaKey))) {
+    if (!evt.target.value.trim() || !(evt.key === `Enter` && (evt.ctrlKey || evt.metaKey))) {
       return;
     }
+
     evt.preventDefault();
     evt.stopPropagation();
 

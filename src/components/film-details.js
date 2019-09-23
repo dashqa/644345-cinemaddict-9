@@ -1,5 +1,6 @@
 import {FILM_CONTROLS, EMOJIS} from '../config';
 import DefaultComponent from './default-component';
+import {sanitizeInput} from '../utils';
 import moment from 'moment';
 import 'moment-duration-format';
 
@@ -198,7 +199,7 @@ class FilmCardDetails extends DefaultComponent {
                   <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
                 </span>
                 <div>
-                  <p class="film-details__comment-text">${comment}</p>
+                  <p class="film-details__comment-text">${sanitizeInput((comment))}</p>
                   <p class="film-details__comment-info">
                     <span class="film-details__comment-author">${author}</span>
                     <span class="film-details__comment-day">${this._humanizeTime(date)}</span>
