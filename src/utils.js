@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 
 
 export const sanitizeInput = (input) => {
-  const config = {ALLOWED_TAGS: ['#text'], KEEP_CONTENT: true};
+  const config = {ALLOWED_TAGS: [`#text`], KEEP_CONTENT: true};
   return DOMPurify.sanitize(input, config);
 };
 
