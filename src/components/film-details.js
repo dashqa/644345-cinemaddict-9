@@ -5,7 +5,7 @@ import 'moment-duration-format';
 
 class FilmCardDetails extends DefaultComponent {
   constructor({title, originalTitle, minAge, rating, director, writers, actors, releaseDate, duration, country, genre,
-    description, picture, inWatchlist, isWatched, isFavorite, userRating}, comments, internetConnection) {
+    description, picture, inWatchlist, isWatched, isFavorite, userRating}, commentsQuantity, internetConnection) {
     super();
     this._title = title;
     this._originalTitle = originalTitle;
@@ -20,35 +20,16 @@ class FilmCardDetails extends DefaultComponent {
     this._genre = genre;
     this._description = description;
     this._picture = picture;
-    this._comments = comments;
     this._inWatchlist = inWatchlist;
     this._isWatched = isWatched;
     this._isFavorite = isFavorite;
     this._userRating = userRating;
+    this._commentsQuantity = commentsQuantity;
     this._internetConnection = internetConnection;
 
     this._onChangeEmojiReaction = this._onChangeEmojiReaction.bind(this);
 
     this._subscribeOnEvents();
-  }
-
-  _humanizeTime(date) {
-    const inMinutes = moment().diff(date, `minutes`);
-    switch (true) {
-      case inMinutes < 1:
-        return `now`;
-      case inMinutes <= 3:
-        return `a minute ago`;
-      case inMinutes <= 59:
-        return `a few minutes ago`;
-      case inMinutes <= 119:
-        return `an hour ago`;
-      case inMinutes <= 1439:
-        return `a few hours ago`;
-      case inMinutes >= 1440:
-        return moment(date).fromNow();
-    }
-    return null;
   }
 
   _getRatingScoreTemplate() {
@@ -189,24 +170,9 @@ class FilmCardDetails extends DefaultComponent {
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments 
-            <span class="film-details__comments-count">${this._comments.length}</span></h3>
+            <span class="film-details__comments-count">${this._commentsQuantity}</span></h3>
         
-            <ul class="film-details__comments-list">
-            ${this._comments.map(({id, comment, author, date, emotion}) => `
-              <li class="film-details__comment">
-                <span class="film-details__comment-emoji">
-                  <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
-                </span>
-                <div>
-                  <p class="film-details__comment-text">${comment}</p>
-                  <p class="film-details__comment-info">
-                    <span class="film-details__comment-author">${author}</span>
-                    <span class="film-details__comment-day">${this._humanizeTime(date)}</span>
-                    <button data-id="${id}" class="film-details__comment-delete" >Delete</button>
-                  </p>
-                </div>
-              </li>`.trim()).join(``)}
-            </ul>
+            <ul class="film-details__comments-list"></ul>
         
             <div class="film-details__new-comment">
               <div for="add-emoji" class="film-details__add-emoji-label">

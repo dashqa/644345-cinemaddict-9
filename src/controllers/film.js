@@ -1,5 +1,6 @@
 import FilmCard from './../components/film-card';
 import FilmCardDetails from './../components/film-details';
+import FilmComment from '../components/film-comment';
 import {render, unrender} from '../utils';
 import {Position} from '../config';
 
@@ -54,16 +55,20 @@ class FilmController {
   _initializeFilmDetails() {
     this._onCommentsChange({action: `get`, filmId: this._data.id})
       .then((comments) => {
-        this._filmDetails = new FilmCardDetails(this._data, comments, this._isOnline());
-        this._renderFilmDetails();
+        this._filmDetails = new FilmCardDetails(this._data, comments.length, this._isOnline());
+        this._renderFilmDetails(comments);
       });
   }
 
-  _renderFilmDetails() {
+  _renderFilmDetails(comments) {
     this._currentFilmDetails = this._filmDetails.getElement();
 
     if (this._isOnline()) {
       const textareaElement = this._currentFilmDetails.querySelector(`.film-details__comment-input`);
+      const commentsListElement = this._currentFilmDetails.querySelector(`.film-details__comments-list`);
+
+      comments.map((comment) => render(commentsListElement, new FilmComment(comment).getElement(), Position.BEFOREEND));
+
       textareaElement.addEventListener(`focus`, () => document.removeEventListener(`keydown`, this._onEscKeyDown));
       textareaElement.addEventListener(`blur`, () => document.addEventListener(`keydown`, this._onEscKeyDown));
 
